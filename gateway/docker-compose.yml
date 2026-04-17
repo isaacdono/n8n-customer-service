@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  wwebjs-service:
+    build: ./wwebjs
+    container_name: wwebjs_client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - FASTAPI_URL=http://fastapi-service:8000
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+    volumes:
+      - ./wwebjs/.wwebjs_auth:/usr/src/app/.wwebjs_auth   # Persist WhatsApp Session
+    networks:
+      - gateway_network
+
+  fastapi-service:
+    build: ./fastapi
+    container_name: python_router
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - WWEBJS_SEND_URL=http://wwebjs-service:3000/send
+      # Substitua os IPs pelos webhooks reais do n8n na sua rede ou cloud
+      - N8N_FALA=http://192.168.1.100:5678/webhook/fala
+      - N8N_CLINICA=http://192.168.1.100:5678/webhook/clinica
+      - N8N_RESTAURANTE=http://192.168.1.100:5678/webhook/restaurante
+    networks:
+      - gateway_network
+
+networks:
+  gateway_network:
+    driver: bridge
