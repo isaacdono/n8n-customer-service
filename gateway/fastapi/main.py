@@ -32,7 +32,6 @@ active_sessions = {}
 MENU_MSG = """👋 Olá! Bem-vindo ao meu portfólio de Agentes de IA.
 Para testar, envie apenas o prefixo do agente desejado, ou já com a sua mensagem:
 
-*@fala* -> Assistente de comunicação e PDF.
 *@clinica* -> Agente de clínica (Agendamentos no Calendar).
 *@restaurante* -> Agente para pedidos e estoque.
 

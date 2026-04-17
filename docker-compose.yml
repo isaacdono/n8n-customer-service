@@ -1,0 +1,72 @@
+version: '3.8'
+
+
+services:
+  wwebjs-service:
+    build: ./gateway/wwebjs
+    container_name: wwebjs_client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - FASTAPI_URL=http://fastapi-service:8000
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+    volumes:
+      - ./gateway/wwebjs/.wwebjs_auth:/usr/src/app/.wwebjs_auth
+    networks:
+      - gateway_network
+    depends_on:
+      fastapi-service:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/send"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  fastapi-service:
+    build: ./gateway/fastapi
+    container_name: python_router
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - WWEBJS_SEND_URL=http://wwebjs-service:3000/send
+      - N8N_CLINICA=${N8N_CLINICA:-http://n8n:5678/webhook/clinica}
+      - N8N_RESTAURANTE=${N8N_RESTAURANTE:-http://n8n:5678/webhook/restaurante}
+    networks:
+      - gateway_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n_server
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - NODE_ENV=production
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - gateway_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
+volumes:
+  n8n_data:
+
+networks:
+  gateway_network:
+    driver: bridge
