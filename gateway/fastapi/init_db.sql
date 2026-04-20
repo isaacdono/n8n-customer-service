@@ -1,0 +1,2 @@
+-- N8N não cria suas tabelas automaticamente neste banco
+-- Você precisa garantir que as tabelas do n8n existam através da UI ou migration do n8n

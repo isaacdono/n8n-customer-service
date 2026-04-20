@@ -19,11 +19,6 @@ services:
     depends_on:
       fastapi-service:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/send"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   fastapi-service:
     build: ./gateway/fastapi
@@ -35,13 +30,26 @@ services:
       - WWEBJS_SEND_URL=http://wwebjs-service:3000/send
       - N8N_CLINICA=${N8N_CLINICA:-http://n8n:5678/webhook/clinica}
       - N8N_RESTAURANTE=${N8N_RESTAURANTE:-http://n8n:5678/webhook/restaurante}
+    volumes:
+      - ./gateway/fastapi:/app
     networks:
       - gateway_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+  postgresql:
+    image: postgres:16-alpine
+    container_name: postgres_chathistory
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=chatuser
+      - POSTGRES_PASSWORD=chatpass123
+      - POSTGRES_DB=chat_history
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./gateway/fastapi/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - gateway_network
 
   n8n:
     image: n8nio/n8n:latest
@@ -58,14 +66,13 @@ services:
       - n8n_data:/home/node/.n8n
     networks:
       - gateway_network
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    depends_on:
+      postgresql:
+        condition: service_started
       
 volumes:
   n8n_data:
+  postgres_data:
 
 networks:
   gateway_network:

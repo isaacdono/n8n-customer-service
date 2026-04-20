@@ -20,8 +20,9 @@
       "parameters": {
         "calendar": {
           "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
           "mode": "list",
-          "value": "YOUR_CALENDAR_ID"
+          "cachedResultName": "Portfolio"
         },
         "start": "={{ $fromAI('Start', '', 'string') }}",
         "end": "={{ $fromAI('End', '', 'string') }}",
@@ -37,15 +38,22 @@
       "position": [
         -368,
         496
-      ]
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "getAll",
         "calendar": {
           "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
           "mode": "list",
-          "value": "YOUR_CALENDAR_ID"
+          "cachedResultName": "Portfolio"
         },
         "returnAll": true,
         "timeMin": "={{ $fromAI('After', '', 'string') }}",
@@ -59,15 +67,22 @@
       "position": [
         -176,
         496
-      ]
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "update",
         "calendar": {
           "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
           "mode": "list",
-          "value": "YOUR_CALENDAR_ID"
+          "cachedResultName": "Portfolio"
         },
         "eventId": "={{ $fromAI('Event_ID', '', 'string') }}",
         "updateFields": {
@@ -82,15 +97,22 @@
       "position": [
         0,
         496
-      ]
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "delete",
         "calendar": {
           "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
           "mode": "list",
-          "value": "YOUR_CALENDAR_ID"
+          "cachedResultName": "Portfolio"
         },
         "eventId": "={{ $fromAI('Event_ID', '', 'string') }}",
         "options": {}
@@ -102,7 +124,13 @@
       "position": [
         192,
         496
-      ]
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
     },
     {
       "parameters": {
@@ -143,7 +171,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        288,
+        304,
         256
       ]
     },
@@ -171,8 +199,9 @@
         "operation": "getAll",
         "calendar": {
           "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
           "mode": "list",
-          "value": "YOUR_CALENDAR_ID"
+          "cachedResultName": "Portfolio"
         },
         "returnAll": true,
         "timeMin": "={{ $today.toISO() }}",
@@ -186,7 +215,13 @@
       "position": [
         -384,
         720
-      ]
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
     },
     {
       "parameters": {
@@ -218,23 +253,8 @@
     },
     {
       "parameters": {
-        "options": {
-          "systemMessage": "Você é a assistente virtual de uma clínica médica. Seu nome é Ana, você é simpática e acolhedora.\nSeu objetivo é ajudar pacientes a agendar, cancelar ou remarcar consultas pelo WhatsApp.\n\n🎯 RESPONSABILIDADES\n• Agendamento de consultas\n• Remarcação (qualquer mudança de data/horário = UPDATE, nunca deletar)\n• Cancelamento (somente quando o paciente pedir explicitamente)\n\n🕰️ FUSO HORÁRIO\n• Sempre use horário de Brasília (BRT, GMT-3)\n• Formato ISO 8601: YYYY-MM-DDTHH:mm:ss-03:00\n\n📋 FLUXO DE AGENDAMENTO\n1. Coletar: nome completo, data desejada, horário desejado\n2. Verificar disponibilidade via Get many events\n3. Criar evento no Google Calendar\n4. Confirmar para o paciente com os detalhes\n\n📋 FLUXO DE REMARCAÇÃO\n1. Buscar evento atual via Get many events\n2. Verificar novo horário\n3. Atualizar evento (nunca deletar)\n4. Confirmar nova data/horário para o paciente\n\n📋 FLUXO DE CANCELAMENTO\n1. Confirmar intenção com o paciente\n2. Buscar Event_ID via Get many events\n3. Deletar evento\n4. Confirmar cancelamento\n\n⏰ HORÁRIOS DISPONÍVEIS: 08:00, 09:00, 10:00, 14:00, 15:00, 16:30\nDuração padrão de cada consulta: 1 hora\n\n⚠️ TRATAMENTO DE ERROS\n• Horário indisponível → Sugira 3 alternativas\n• Dados faltando → Pergunte antes de prosseguir\n• Ambiguidade entre remarcar/cancelar → Pergunte para confirmar\n\nSempre responda em português do Brasil, de forma humana e acolhedora. Nunca use linguagem robótica."
-        }
-      },
-      "id": "147823e4-6bd6-4fd6-9070-43b9cbe29a2a",
-      "name": "AI Agent1",
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [
-        -640,
-        256
-      ]
-    },
-    {
-      "parameters": {
         "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.sessionId }}",
+        "sessionKey": "={{ $json.body.from }}",
         "contextWindowLength": 20
       },
       "id": "1ed25b59-918a-42ac-8d85-0a99cecb21be",
@@ -260,21 +280,6 @@
         112
       ],
       "typeVersion": 1
-    },
-    {
-      "parameters": {
-        "options": {
-          "maxOutputTokens": 2048
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        -720,
-        512
-      ],
-      "id": "904ac78c-883e-48af-9fa5-fc10b3b390e0",
-      "name": "Google Gemini Chat Model"
     },
     {
       "parameters": {
@@ -310,13 +315,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
           "mode": "list",
-          "value": "YOUR_SPREADSHEET_ID"
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
+          "value": 2137517358,
           "mode": "list",
-          "value": "cardapio"
+          "cachedResultName": "cardápio",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=2137517358"
         },
         "options": {}
       },
@@ -327,7 +336,13 @@
       "position": [
         -80,
         1584
-      ]
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
@@ -353,8 +368,8 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.2,
       "position": [
-        512,
-        1584
+        784,
+        1600
       ]
     },
     {
@@ -380,13 +395,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
           "mode": "list",
-          "value": "YOUR_SPREADSHEET_ID"
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
+          "value": "gid=0",
           "mode": "list",
-          "value": "pedidos"
+          "cachedResultName": "pedidos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=0"
         },
         "options": {}
       },
@@ -397,7 +416,13 @@
       "position": [
         -464,
         1904
-      ]
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
@@ -464,13 +489,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
           "mode": "list",
-          "value": "YOUR_SPREADSHEET_ID"
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
+          "value": 154498146,
           "mode": "list",
-          "value": "estoque"
+          "cachedResultName": "estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=154498146"
         },
         "options": {}
       },
@@ -481,7 +510,13 @@
       "position": [
         -464,
         2112
-      ]
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
@@ -615,48 +650,83 @@
     },
     {
       "parameters": {
-        "options": {
-          "maxOutputTokens": 2048,
-          "safetySettings": {
-            "values": [
-              {}
-            ]
-          }
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        -672,
-        1584
-      ],
-      "id": "a42b6ef2-0db1-4396-b32a-f179a47ba206",
-      "name": "Google Gemini Chat Model1"
-    },
-    {
-      "parameters": {
         "operation": "append",
         "documentId": {
           "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
           "mode": "list",
-          "value": "YOUR_SPREADSHEET_ID"
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
-          "value": "reservas",
-          "mode": "id"
+          "value": 252605372,
+          "mode": "list",
+          "cachedResultName": "reservas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=252605372"
         },
         "columns": {
           "mappingMode": "defineBelow",
-          "value": {
-            "data": "={{ $fromAI('data', '', 'string') }}",
-            "cliente": "={{ $fromAI('cliente', '', 'string') }}",
-            "telefone": "={{ $fromAI('telefone', '', 'string') }}",
-            "itens": "={{ $fromAI('itens', '', 'string') }}",
-            "tipo": "={{ $fromAI('tipo', 'delivery ou retirada ou mesa', 'string') }}",
-            "total": "={{ $fromAI('total', '', 'string') }}",
-            "status": "em preparo"
-          }
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "horário ",
+              "displayName": "horário ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cliente",
+              "displayName": "cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pessoas ",
+              "displayName": "pessoas ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
         "options": {}
       },
@@ -667,19 +737,29 @@
       "position": [
         96,
         1584
-      ]
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
         "documentId": {
           "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
           "mode": "list",
-          "value": "YOUR_SPREADSHEET_ID"
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
-          "value": "reservas",
-          "mode": "id"
+          "value": 252605372,
+          "mode": "list",
+          "cachedResultName": "reservas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=252605372"
         },
         "options": {}
       },
@@ -688,34 +768,104 @@
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.5,
       "position": [
-        272,
+        240,
         1584
-      ]
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
         "operation": "append",
         "documentId": {
           "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
           "mode": "list",
-          "value": "YOUR_SPREADSHEET_ID"
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
+          "value": "gid=0",
           "mode": "list",
-          "value": "pedidos"
+          "cachedResultName": "pedidos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=0"
         },
         "columns": {
           "mappingMode": "defineBelow",
-          "value": {
-            "data": "={{ $fromAI('data', '', 'string') }}",
-            "cliente": "={{ $fromAI('cliente', '', 'string') }}",
-            "telefone": "={{ $fromAI('telefone', '', 'string') }}",
-            "itens": "={{ $fromAI('itens', '', 'string') }}",
-            "tipo": "={{ $fromAI('tipo', 'delivery ou retirada ou mesa', 'string') }}",
-            "total": "={{ $fromAI('total', '', 'string') }}",
-            "status": "em preparo"
-          }
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cliente",
+              "displayName": "cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "itens",
+              "displayName": "itens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "total",
+              "displayName": "total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
         "options": {}
       },
@@ -726,7 +876,181 @@
       "position": [
         -256,
         1584
-      ]
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "moonshotai/kimi-k2-instruct-0905",
+          "mode": "list",
+          "cachedResultName": "moonshotai/kimi-k2-instruct-0905"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 256
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -736,
+        496
+      ],
+      "id": "fbea2fd3-11dd-4f34-beff-666ca0f83eac",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "89Ai9yfulvkx2uI7",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "z-ai/glm4.7",
+          "mode": "list",
+          "cachedResultName": "z-ai/glm4.7"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 256
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -688,
+        1584
+      ],
+      "id": "51146317-a31a-4107-b0ee-6d38e3a07c82",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "EDcVLXZ9rphpzs2H",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 154498146,
+          "mode": "list",
+          "cachedResultName": "estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=154498146"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ingrediente",
+              "displayName": "ingrediente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "quantidade",
+              "displayName": "quantidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "unidade",
+              "displayName": "unidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mínimo",
+              "displayName": "mínimo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "698a4460-5cb3-494f-a20e-dd89a8239f0e",
+      "name": "Registrar Estoque (Sheets)1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        608,
+        1584
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 154498146,
+          "mode": "list",
+          "cachedResultName": "estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=154498146"
+        },
+        "options": {}
+      },
+      "id": "df297040-db40-4b8f-aa31-030b747df7fa",
+      "name": "Ler Estoque (Sheets)1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        416,
+        1584
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
@@ -734,131 +1058,77 @@
         "path": "clinica",
         "options": {}
       },
-      "id": "a8dd5879-1fd7-40ec-a0d5-26419df163cc",
-      "name": "Webhook WhatsApp2",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -2320,
-        1072
+        -912,
+        256
       ],
-      "webhookId": "d582d1f1-138f-4c71-9dc5-20786f61f008"
+      "id": "591eb3d3-c41b-4192-968d-e1ee93ed7d2c",
+      "name": "Webhook",
+      "webhookId": "c798f6da-968f-45d2-b959-7c907457a3ba"
     },
     {
       "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "e7acda0f-fe95-481a-8abb-adaa953b8ec0"
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "c46c1cd1-fd0d-4216-b551-e09433c00886",
-                    "leftValue": "",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
+        "httpMethod": "POST",
+        "path": "restaurante",
         "options": {}
       },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
       "position": [
-        -1760,
-        1056
+        -992,
+        1312
       ],
-      "id": "13649721-5b70-47e1-a8c0-5b87c3a69979",
-      "name": "Switch"
+      "id": "b825a664-ff0d-48b9-a452-5cef31e807ca",
+      "name": "Webhook1",
+      "webhookId": "c798f6da-968f-45d2-b959-7c907457a3ba"
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "a1",
-              "name": "chatInput",
-              "value": "={{ $json.message }}",
-              "type": "string"
-            },
-            {
-              "id": "a2",
-              "name": "sessionId",
-              "value": "={{ $json.from }}",
-              "type": "string"
-            },
-            {
-              "id": "a3",
-              "name": "senderName",
-              "value": "={{ $json.name }}",
-              "type": "string"
-            },
-            {
-              "id": "a4",
-              "name": "from",
-              "value": "={{ $json.from }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "options": {
+          "maxOutputTokens": 256
+        }
       },
-      "id": "4c42bbd0-912f-421f-8301-95df1924b5a7",
-      "name": "Parse Input2",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
       "position": [
-        -2048,
-        1072
-      ]
+        -1328,
+        576
+      ],
+      "id": "47384408-62f2-4cea-b04e-d5c7121079f6",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "28E3BbXGOscb8zfB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.original_message }}",
+        "options": {
+          "systemMessage": "Você é a assistente virtual de uma clínica médica. Seu nome é Ana, você é simpática e acolhedora.\\nSeu objetivo é ajudar pacientes a agendar, cancelar ou remarcar consultas pelo WhatsApp.\\n\\n🎯 RESPONSABILIDADES\\n• Agendamento de consultas\\n• Remarcação (qualquer mudança de data/horário = UPDATE, nunca deletar)\\n• Cancelamento (somente quando o paciente pedir explicitamente)\\n\\n🕰️ FUSO HORÁRIO\\n• Sempre use horário de Brasília (BRT, GMT-3)\\n• Formato ISO 8601: YYYY-MM-DDTHH:mm:ss-03:00\\n\\n📋 FLUXO DE AGENDAMENTO\\n1. Coletar: nome completo, data desejada, horário desejado\\n2. Verificar disponibilidade via Get many events\\n3. Criar evento no Google Calendar\\n4. Confirmar para o paciente com os detalhes\\n\\n📋 FLUXO DE REMARCAÇÃO\\n1. Buscar evento atual via Get many events\\n2. Verificar novo horário\\n3. Atualizar evento (nunca deletar)\\n4. Confirmar nova data/horário para o paciente\\n\\n📋 FLUXO DE CANCELAMENTO\\n1. Confirmar intenção com o paciente\\n2. Buscar Event_ID via Get many events\\n3. Deletar evento\\n4. Confirmar cancelamento\\n\\n⏰ HORÁRIOS DISPONÍVEIS: 08:00, 09:00, 10:00, 14:00, 15:00, 16:30\\nDuração padrão de cada consulta: 1 hora\\n\\n⚠️ TRATAMENTO DE ERROS\\n• Horário indisponível → Sugira 3 alternativas\\n• Dados faltando → Pergunte antes de prosseguir\\n• Ambiguidade entre remarcar/cancelar → Pergunte para confirmar\\n\\nSempre responda em português do Brasil, de forma humana e acolhedora. Nunca use linguagem robótica.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -528,
+        256
+      ],
+      "id": "5374e8ec-a2f4-4a39-8afa-52ce9f4b0dbe",
+      "name": "AI Agent1"
     }
   ],
   "pinData": {},
   "connections": {
     "Enviar resposta (FastAPI)": {
       "main": [
-        [
-          {
-            "node": "Responder Webhook",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Criar evento no Google Calendar": {
@@ -927,34 +1197,12 @@
         ]
       ]
     },
-    "AI Agent1": {
-      "main": [
-        [
-          {
-            "node": "Enviar resposta (FastAPI)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Simple Memory1": {
       "ai_memory": [
         [
           {
             "node": "AI Agent1",
             "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent1",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -1092,17 +1340,6 @@
         ]
       ]
     },
-    "Google Gemini Chat Model1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Registrar Reserva (Sheets)1": {
       "ai_tool": [
         [
@@ -1136,18 +1373,51 @@
         ]
       ]
     },
-    "Webhook WhatsApp2": {
-      "main": [
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
         [
           {
-            "node": "Parse Input2",
-            "type": "main",
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
       ]
     },
-    "Switch": {
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Estoque (Sheets)1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Estoque (Sheets)1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
       "main": [
         [
           {
@@ -1155,7 +1425,11 @@
             "type": "main",
             "index": 0
           }
-        ],
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
         [
           {
             "node": "AI Agent",
@@ -1165,11 +1439,16 @@
         ]
       ]
     },
-    "Parse Input2": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "AI Agent1": {
       "main": [
         [
           {
-            "node": "Switch",
+            "node": "Enviar resposta (FastAPI)",
             "type": "main",
             "index": 0
           }
@@ -1182,7 +1461,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "59036198-a671-46d5-b064-db691b16f97c",
+  "versionId": "72a62b76-d8f6-4a59-987d-508447a6b57b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "1d9b28db4004bc0e5d272e2147ebbbca9adef92b8cee18fb1f0894078eebc9b6"

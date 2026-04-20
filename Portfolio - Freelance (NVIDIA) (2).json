@@ -1,0 +1,1267 @@
+{
+  "name": "Portfolio - Freelance (NVIDIA)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# 🗓️ BytezTech Appointment Bot\n\n## How it works\nTwo parallel flows run independently:\n1. **AI Chat Flow** — clients message the bot to book, reschedule, or cancel meetings. The agent checks Google Calendar availability, creates/updates/deletes events, and sends Gmail confirmations automatically.\n2. **Daily Sync Flow** — every morning at 9:30 AM IST, today's calendar events are cleared from the sheet, re-fetched, formatted, and re-inserted. An admin summary email is then sent.\n\n## Setup steps\n1. Add **Google Calendar OAuth** credential (jigneshmevada87@gmail.com)\n2. Add **Gmail OAuth** credential for agent tool + admin report node\n3. Add **Google Sheets OAuth** for Clear node; **Service Account** for Insert node\n4. Add **Groq API** key for the LLaMA 4 Scout language model\n5. **Activate** the workflow — both flows will run independently",
+        "height": 496,
+        "width": 548
+      },
+      "id": "27e5a3f0-957b-4328-ade1-7e9e8f1abdf6",
+      "name": "⭐ Main Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        768
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
+          "mode": "list",
+          "cachedResultName": "Portfolio"
+        },
+        "start": "={{ $fromAI('Start', '', 'string') }}",
+        "end": "={{ $fromAI('End', '', 'string') }}",
+        "additionalFields": {
+          "description": "={{ $fromAI('Description', '', 'string') }}",
+          "summary": "={{ $fromAI('Summary', '', 'string') }}"
+        }
+      },
+      "id": "7e05bd5f-1399-4627-ad06-1642d8cd7262",
+      "name": "Criar evento no Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        3712,
+        1056
+      ],
+      "rewireOutputLogTo": "ai_tool",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
+          "mode": "list",
+          "cachedResultName": "Portfolio"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $fromAI('After', '', 'string') }}",
+        "timeMax": "={{ $fromAI('Before', '', 'string') }}",
+        "options": {}
+      },
+      "id": "521fbecf-53e8-4ccc-b1bb-b37aa98e2530",
+      "name": "Buscar eventos no Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        3872,
+        1056
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
+          "mode": "list",
+          "cachedResultName": "Portfolio"
+        },
+        "eventId": "={{ $fromAI('Event_ID', '', 'string') }}",
+        "updateFields": {
+          "end": "={{ $fromAI('End', '', 'string') }}",
+          "start": "={{ $fromAI('Start', '', 'string') }}"
+        }
+      },
+      "id": "d13eb4d5-2f7d-4ddb-bb8d-f972deeb13b6",
+      "name": "Atualizar evento no Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        4048,
+        1056
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
+          "mode": "list",
+          "cachedResultName": "Portfolio"
+        },
+        "eventId": "={{ $fromAI('Event_ID', '', 'string') }}",
+        "options": {}
+      },
+      "id": "f82363a5-b8f0-4fcb-ab07-dcf548fb9c6f",
+      "name": "Deletar evento no Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        4240,
+        1056
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi-service:8000/send",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $('Webhook').item.json.body.from }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2f249714-e235-48e8-86b1-d586d4a8e2c6",
+      "name": "Enviar resposta (FastAPI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3936,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "31c339bd-39d8-4d55-a4af-c3f24ed873cc",
+      "name": "Lembrete Diário (9h)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        3328,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "isaacoli.tech@gmail.com",
+          "mode": "list",
+          "cachedResultName": "Portfolio"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $today.toISO() }}",
+        "timeMax": "={{ $today.plus({days: 1}).toISO() }}",
+        "options": {}
+      },
+      "id": "cfc424a6-fb42-4fd5-ac15-69956987664c",
+      "name": "Buscar consultas de amanhã",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        3664,
+        1296
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "TWt34ovaY2mnAgbv",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Consultório / Clínica Workflow",
+        "height": 80,
+        "width": 548
+      },
+      "id": "2bb6bd9b-4adc-4163-a31f-da4a51d3476c",
+      "name": "⭐ Main Overview1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3456,
+        672
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.original_message }}",
+        "options": {
+          "systemMessage": "=Você é o assistente virtual do Restaurante Demo, simpático e eficiente. Seu nome é Zé.\n\n🎯 RESPONSABILIDADES\n• Receber pedidos para delivery ou retirada\n• Informar o cardápio e preços\n• Registrar reservas de mesa\n\n📋 FLUXO DE PEDIDO\n1. Perguntar se é delivery, retirada ou mesa\n2. Apresentar cardápio se o cliente pedir\n3. Coletar os itens desejados\n4. Confirmar o pedido com total estimado\n5. Registrar no Google Sheets (aba 'pedidos') usando a tool Registrar Pedido\n\n\n📋 FLUXO DE RESERVA\n1. Coletar: nome, data, horário, número de pessoas\n2. Verificar disponibilidade no Sheets\n4. Confirmar para o cliente\n\n📋 FLUXO DE CARDÁPIO\n1. Ler a aba 'cardapio' do Google Sheets\n2. Listar apenas itens com disponivel = TRUE\n3. Formatar de forma legível com preços\n\nSempre responda em português do Brasil, de forma simpática e ágil. Nunca use linguagem robótica.\nFormate valores sempre em reais: R$ XX,XX\n\nHoje é {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}.Sempre use essa data como referência para qualquer cálculo de datas.",
+          "maxIterations": 10
+        }
+      },
+      "id": "5cbe0eb1-e26d-4187-bf78-443371532e6a",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        3424,
+        1888
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2137517358,
+          "mode": "list",
+          "cachedResultName": "cardápio",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=2137517358"
+        },
+        "options": {}
+      },
+      "id": "b9b21d23-4d43-43d8-917d-35392ba6902c",
+      "name": "Ler Cardápio (Sheets)",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        3968,
+        2144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "95646415-0f41-4367-b310-92736d49d15c",
+      "name": "Relatório Semanal (Segunda 8h)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        3360,
+        2464
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "pedidos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "f2b27d40-b534-41dd-8da4-14bb0c22484b",
+      "name": "Ler Pedidos da Semana (Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3584,
+        2464
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst agora = new Date();\nconst umaSemanaAtras = new Date();\numaSemanaAtras.setDate(agora.getDate() - 7);\numaSemanaAtras.setHours(0, 0, 0, 0);\n\nconst pedidosSemana = rows.filter(r => {\n  if (!r.data) return false;\n  const [d, m, y] = r.data.split('/');\n  const dataPedido = new Date(`${y}-${m}-${d}`);\n  return dataPedido >= umaSemanaAtras;\n});\n\nconst totalPedidos = pedidosSemana.length;\nconst faturamento = pedidosSemana.reduce((acc, r) => {\n  const val = parseFloat(\n    (r.total || '0').toString().replace('R$', '').replace(',', '.').trim()\n  );\n  return acc + (isNaN(val) ? 0 : val);\n}, 0);\n\n// Ranking contando unidades (ex: \"2x Hambúrguer\" soma 2)\nconst contagem = {};\npedidosSemana.forEach(r => {\n  const itens = (r.itens || '').split(',');\n  itens.forEach(item => {\n    const match = item.trim().match(/^(\\d+)x\\s*(.+)/i);\n    if (match) {\n      const qtd = parseInt(match[1]);\n      const key = match[2].trim();\n      contagem[key] = (contagem[key] || 0) + qtd;\n    } else {\n      const key = item.trim();\n      if (key) contagem[key] = (contagem[key] || 0) + 1;\n    }\n  });\n});\n\nconst ranking = Object.entries(contagem)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([item, qtd], i) => `${i+1}. ${item} (${qtd}x)`)\n  .join('\\n');\n\nconst mensagem = `📊 *Relatório Semanal do Restaurante*\\n\\n` +\n  `📦 Total de pedidos: ${totalPedidos}\\n` +\n  `💰 Faturamento estimado: R$ ${faturamento.toFixed(2).replace('.', ',')}\\n` +\n  `📈 Ticket médio: R$ ${totalPedidos > 0 ? (faturamento / totalPedidos).toFixed(2).replace('.', ',') : '0,00'}\\n\\n` +\n  `🏆 *Top 5 itens mais pedidos:*\\n${ranking || 'Sem dados suficientes'}\\n\\n` +\n  `_Bora mais essa semana! 💪_`;\n\nreturn [{ json: { mensagem } }];"
+      },
+      "id": "94e1f56b-5a1b-430b-9890-046546c121e7",
+      "name": "Calcular Relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3808,
+        2464
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Restaurante Workflow",
+        "height": 80,
+        "width": 548
+      },
+      "id": "7bc905d7-f9c0-4548-b1fc-ee8a76875191",
+      "name": "⭐ Main Overview2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3472,
+        1744
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 252605372,
+          "mode": "list",
+          "cachedResultName": "reservas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=252605372"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "data": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data', ``, 'string') }}",
+            "horário ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('hor_rio_', ``, 'string') }}",
+            "cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('cliente', ``, 'string') }}",
+            "telefone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefone', ``, 'string') }}",
+            "pessoas ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('pessoas_', ``, 'string') }}",
+            "status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "horário ",
+              "displayName": "horário ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cliente",
+              "displayName": "cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pessoas ",
+              "displayName": "pessoas ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2a4b5cca-223f-4ac1-a7b4-f5d5d39c8a0a",
+      "name": "Registrar Reserva (Sheets)1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        4144,
+        2144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 252605372,
+          "mode": "list",
+          "cachedResultName": "reservas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=252605372"
+        },
+        "options": {}
+      },
+      "id": "73ef55a3-916f-4fc7-ab24-0447118e33be",
+      "name": "Ler Reserva (Sheets)1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        4288,
+        2144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "mode": "list",
+          "cachedResultName": "portfolio - restaurante",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "pedidos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "data": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data', ``, 'string') }}",
+            "cliente": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('cliente', ``, 'string') }}",
+            "telefone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('telefone', ``, 'string') }}",
+            "itens": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('itens', ``, 'string') }}",
+            "tipo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('tipo', ``, 'string') }}",
+            "total": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('total', ``, 'string') }}",
+            "status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cliente",
+              "displayName": "cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "itens",
+              "displayName": "itens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "total",
+              "displayName": "total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "0d540faf-7368-41ee-aa3d-9c8f23b68c33",
+      "name": "Registrar Pedido (Sheets)",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        3792,
+        2144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6KXsjN8ZebNSQo1u",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "clinica",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        3136,
+        816
+      ],
+      "id": "ea229b0a-02bc-4e5b-ab5b-ea67b47083e8",
+      "name": "Webhook",
+      "webhookId": "c798f6da-968f-45d2-b959-7c907457a3ba"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.original_message }}",
+        "options": {
+          "systemMessage": "=Você é Ana, assistente virtual simpática e acolhedora da nossa clínica médica. \nAtende pacientes pelo WhatsApp para agendar, remarcar ou cancelar consultas.\n\nHoje é {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}.Sempre use essa data como referência para qualquer cálculo de datas.\n\n---\n\n## 🛠️ Tools Disponíveis\n\n| Tool | Quando usar |\n|---|---|\n| `calendar_get_events` | Verificar disponibilidade ou buscar evento existente |\n| `calendar_create_event` | Criar nova consulta |\n| `calendar_update_event` | Remarcar consulta (NUNCA deletar para remarcar) |\n| `calendar_delete_event` | Cancelar consulta (somente a pedido explícito) |\n\n---\n\n## 📋 Fluxos\n\n**Agendamento**\n1. Colete: nome completo, data e horário desejados\n2. `calendar_get_events` → verificar disponibilidade\n3. `calendar_create_event` → criar consulta\n4. Confirme os detalhes ao paciente\n\n**Remarcação**\n1. `calendar_get_events` → localizar evento atual\n2. Verifique novo horário desejado\n3. `calendar_update_event` → atualizar (jamais deletar)\n4. Confirme nova data/horário ao paciente\n\n**Cancelamento**\n1. Confirme a intenção do paciente\n2. `calendar_get_events` → obter Event_ID\n3. `calendar_delete_event` → remover evento\n4. Confirme o cancelamento ao paciente",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3520,
+        816
+      ],
+      "id": "3f346d11-9e65-4dc0-8a53-56ef13cf811a",
+      "name": "AI Agent1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.from }}",
+        "tableName": "chat_history",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3536,
+        1024
+      ],
+      "id": "f632c060-013c-44eb-b07d-e4956898e5fb",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "LWVFOft3JIsCGzVz",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxOutputTokens": 256,
+          "safetySettings": {
+            "values": [
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        1024
+      ],
+      "id": "8b688374-3de2-4a1d-af3d-ef9e4dbd46fc",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "28E3BbXGOscb8zfB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {
+          "maxOutputTokens": 1024,
+          "safetySettings": {
+            "values": [
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3312,
+        2192
+      ],
+      "id": "f016013d-86a6-4386-94ca-0e99199ace4e",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "28E3BbXGOscb8zfB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.from }}",
+        "tableName": "chat_history",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3552,
+        2192
+      ],
+      "id": "dfd59dae-061c-4c2b-a361-3bb6df29b92c",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "LWVFOft3JIsCGzVz",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "restaurante",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        3072,
+        1904
+      ],
+      "id": "3acd64d3-bff3-47d7-b53e-58cfd0bf14e1",
+      "name": "Webhook1",
+      "webhookId": "c798f6da-968f-45d2-b959-7c907457a3ba"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi-service:8000/send",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $('Webhook1').item.json.body.from }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "09f716e4-e1aa-4a56-9efb-4a310ccf1879",
+      "name": "Enviar resposta (FastAPI)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4048,
+        1888
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi-service:8000/send",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "142575851852025@lid"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.mensagem }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8bdcc547-4476-4532-8eb5-4e8122a623cc",
+      "name": "Enviar resposta (FastAPI)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4384,
+        2464
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi-service:8000/send",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $('Webhook').item.json.body.from }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0d3527bc-393f-41e3-9bb7-583f4e22bce4",
+      "name": "Enviar resposta (FastAPI)3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4592,
+        1216
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c0e3517d-754d-4501-9453-416d39ea52ae",
+              "leftValue": "={{ $json.vazio }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4064,
+        1280
+      ],
+      "id": "83837f2f-0ff2-4e3f-846c-f5e5d3a3680f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fastapi-service:8000/send",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "142575851852025@lid"
+            },
+            {
+              "name": "message",
+              "value": "Não há consultas amanhã."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "19025490-473d-4411-b40c-2313ae5fd309",
+      "name": "Enviar resposta (FastAPI)4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4624,
+        1456
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const eventos = $json.items || [];\n\nif (eventos.length === 0) {\n  return [{ json: { vazio: true } }];\n}\n\nreturn eventos.map(e => ({ json: { ...e, vazio: false } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3872,
+        1296
+      ],
+      "id": "43cfe9a6-b5ad-4477-b558-6fb7726e9864",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n:5678",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "connection": "keep-alive",
+            "user-agent": "python-httpx/0.28.1",
+            "content-length": "179",
+            "content-type": "application/json"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "from": "142575851852025@lid",
+            "name": "Isaac",
+            "original_message": "marque outro, por favor,",
+            "message_cleaned": "marque outro, por favor,",
+            "prefix": "@clinica",
+            "timestamp": 1776628630
+          },
+          "webhookUrl": "http://localhost:5678/webhook/clinica",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n:5678",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "connection": "keep-alive",
+            "user-agent": "python-httpx/0.28.1",
+            "content-length": "179",
+            "content-type": "application/json"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "from": "142575851852025@lid",
+            "name": "Isaac",
+            "original_message": "marque outro, por favor,",
+            "message_cleaned": "marque outro, por favor,",
+            "prefix": "@clinica",
+            "timestamp": 1776628630
+          },
+          "webhookUrl": "http://localhost:5678/webhook/clinica",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Criar evento no Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar eventos no Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar evento no Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deletar evento no Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lembrete Diário (9h)": {
+      "main": [
+        [
+          {
+            "node": "Buscar consultas de amanhã",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar consultas de amanhã": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Enviar resposta (FastAPI)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Cardápio (Sheets)": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relatório Semanal (Segunda 8h)": {
+      "main": [
+        [
+          {
+            "node": "Ler Pedidos da Semana (Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Pedidos da Semana (Sheets)": {
+      "main": [
+        [
+          {
+            "node": "Calcular Relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Relatório": {
+      "main": [
+        [
+          {
+            "node": "Enviar resposta (FastAPI)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Reserva (Sheets)1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Reserva (Sheets)1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Pedido (Sheets)": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Enviar resposta (FastAPI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Enviar resposta (FastAPI)3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar resposta (FastAPI)4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar resposta (FastAPI)3": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "89057def-dad6-4d80-8871-f59bd7c9a60a",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1d9b28db4004bc0e5d272e2147ebbbca9adef92b8cee18fb1f0894078eebc9b6"
+  },
+  "id": "TKtzzUyoLNu5A5KI",
+  "tags": []
+}
