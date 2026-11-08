@@ -1,11 +1,7 @@
-version: '3.8'
-
-
 services:
   wwebjs-service:
     build: ./gateway/wwebjs
     container_name: wwebjs_client
-    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
@@ -23,26 +19,28 @@ services:
   fastapi-service:
     build: ./gateway/fastapi
     container_name: python_router
-    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
       - WWEBJS_SEND_URL=http://wwebjs-service:3000/send
       - N8N_CLINICA=${N8N_CLINICA:-http://n8n:5678/webhook/clinica}
       - N8N_RESTAURANTE=${N8N_RESTAURANTE:-http://n8n:5678/webhook/restaurante}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://chatuser:chatpass123@postgresql:5432/chat_history}
     volumes:
       - ./gateway/fastapi:/app
     networks:
       - gateway_network
+    depends_on:
+      postgresql:
+        condition: service_started
 
   postgresql:
     image: postgres:16-alpine
     container_name: postgres_chathistory
-    restart: unless-stopped
     environment:
-      - POSTGRES_USER=chatuser
-      - POSTGRES_PASSWORD=chatpass123
-      - POSTGRES_DB=chat_history
+      - POSTGRES_USER=${POSTGRES_USER:-chatuser}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-chatpass123}
+      - POSTGRES_DB=${POSTGRES_DB:-chat_history}
     ports:
       - "5432:5432"
     volumes:
@@ -54,7 +52,6 @@ services:
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n_server
-    restart: unless-stopped
     ports:
       - "5678:5678"
     environment:
@@ -62,6 +59,12 @@ services:
       - N8N_PORT=5678
       - NODE_ENV=production
       - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgresql
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-chat_history}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-chatuser}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-chatpass123}
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
@@ -69,7 +72,7 @@ services:
     depends_on:
       postgresql:
         condition: service_started
-      
+
 volumes:
   n8n_data:
   postgres_data:
