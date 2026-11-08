@@ -1,44 +1,51 @@
-Q1 - Agente Fala Aí
-* trilhas de comunicação geral (dicas de fono), do meme ao argumento e falar em público
-• áudio, pdf de análise, vocabulário
+# n8n Customer Service Gateway
 
-Q2 - Atendimento cliente/clínica integrado com planilha e calendário 
-• CRUD básico e notificação de confirmação 
+> Multi-tenant WhatsApp gateway for automated customer service, appointment scheduling, and order management built with **n8n**, **FastAPI (Python)**, **whatsapp-web.js (Node.js)**, and **PostgreSQL**.
 
-Q3 - CRM de restaurante, pipeline integrado
-• Controle de estoque, pedidos, tendências, redes sociais, etc
+## Architecture
 
----
+```mermaid
+graph LR
+    User["Customer<br>(WhatsApp)"] <-->|Messages| WWebJS["wwebjs<br>(Node.js)"]
+    WWebJS -->|Webhook| FastAPI["FastAPI Router<br>(Python)"]
+    FastAPI <-->|State & Memory| Postgres[("PostgreSQL 16")]
+    FastAPI -->|Dispatch| N8N["n8n Workflows<br>(OpenRouter LLM)"]
+    
+    N8N --> Flow1["@clinica<br>Google Calendar"]
+    N8N --> Flow2["@restaurante<br>Google Sheets"]
+    
+    Flow1 --> FastAPI
+    Flow2 --> FastAPI
+```
 
-Na Q2 e Q3 publicar agendas e uma spreadshet, de tal maneira que com um /test, o cliente possa interagir com o case e ver na planilha em tempo real
+| Service | Stack | Role |
+| :--- | :--- | :--- |
+| **WhatsApp Client** | Node.js + `whatsapp-web.js` | Manages WhatsApp Web session and message ingestion/delivery. |
+| **Gateway Router** | Python + `FastAPI` + `asyncpg` | Command routing (`@clinica`, `@restaurante`, `@fim`) and session management. |
+| **Workflow Engine** | `n8n` + OpenRouter (`nvidia/nemotron-3.5-lightning:free`) | AI agents, tool calling, and scheduled cron jobs. |
+| **Database** | `PostgreSQL 16` | Unified storage for n8n state, `chat_history`, and `active_sessions`. |
 
+## Workflows (`n8n-workflows.json`)
 
-16 e 17 de abril - clínica e consultório
-18 e 19 de abril - restaurantes
-8 e 9 de maio - fala aí 
+Users interact through a single WhatsApp number and switch contexts using prefixes:
 
-Quem realmente usa WhatsApp para vender/atender em Campinas
-Negócios onde o WhatsApp é o canal principal de contato e o dono responde na mão:
+* **`@clinica` (Clinic Scheduling):** Checks availability, books, reschedules, and cancels appointments in **Google Calendar**, plus a daily 09:00 reminder cron.
+* **`@restaurante` (Orders & Reservations):** Checks menu stock, registers orders, and books tables in **Google Sheets**, plus a weekly Monday 08:00 summary cron.
+* **`@fim` (Reset):** Clears the active session and purges conversation history in PostgreSQL.
 
-🏠 Corretoras de imóveis independentes — ótima sacada. Corretor autônomo recebe lead pelo Zap Imóveis ou OLX, responde manualmente, perde timing. Um bot que responde na hora com informações do imóvel e agenda visita é ouro para eles — e pagam bem
+## Screenshots
 
-💇 Salões de beleza e barbearias — agendamento 100% no WhatsApp, dono vive respondendo fora de hora, inclusive de madrugada
+<!-- Add screenshots of the n8n canvas and WhatsApp conversation here -->
+* *n8n Workflow Canvas:* `docs/n8n-canvas.png`
+* *WhatsApp Interaction:* `docs/whatsapp-demo.png`
 
-🐾 Petshops e clínicas veterinárias — agendamento de banho/tosa, lembrete de vacina, muito volume de mensagem repetitiva
+## Quick Start
 
-🏋️ Studios de pilates/yoga — agenda de aulas, confirmação de presença, reposição de aula cancelada
+```bash
+cp .env.example .env
+docker compose up --build
+```
 
-🛒 Lojas de bairro e mercadinhos — lista de pedidos pelo WhatsApp, notificação de entrega, controle de fiado (planilha)
-
-🚗 Oficinas mecânicas — orçamento pelo WhatsApp, status do carro, notificação quando ficou pronto
-
-📦 Distribuidoras e atacadistas pequenos — pedido de reposição de estoque por WhatsApp de revendedores
-
-
-
-
-https://calendar.app.google/iaB9paGQ1itfxrSi8
-
-https://calendar.google.com/calendar/embed?src=isaacoli.tech%40gmail.com&ctz=America%2FSao_Paulo
-
-https://calendar.google.com/calendar/u/1?cid=aXNhYWNvbGkudGVjaEBnbWFpbC5jb20
+* **WhatsApp Gateway:** `http://localhost:3000` (scan QR code in logs on first run)
+* **FastAPI Docs:** `http://localhost:8000/docs`
+* **n8n UI:** `http://localhost:5678` (import `n8n-workflows.json`)
