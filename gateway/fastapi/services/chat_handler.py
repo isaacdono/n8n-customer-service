@@ -1,78 +1,105 @@
 from models.schemas import InboundWhatsAppMsg
+from repositories.chat_repository import ChatRepository
+from repositories.session_repository import SessionRepository
 from services.whatsapp_service import WhatsAppService
 from services.n8n_service import N8NService
 from core.config import settings
 
-MENU_MSG = """👋 Olá! Bem-vindo ao meu portfólio de Agentes de IA.\n
-Para testar, envie apenas "@clinica" ou "@restaurante". \n
+MENU_MSG = """Ola! Bem-vindo ao gateway de atendimento automatizado.
 
-*@clinica* -> Agente de clínica (Agendamentos no Calendar).
-*@restaurante* -> Agente para pedidos e estoque.
+Para iniciar, envie apenas "@clinica" ou "@restaurante":
 
-A qualquer momento, digite *@fim* para encerrar a conversa atual, limpar o histórico e voltar a este menu."""
+*@clinica* -> Agendamento, remarcacao e cancelamento de consultas (Google Calendar).
+*@restaurante* -> Cardapio, pedidos e reservas de mesa (Google Sheets CRM).
+
+A qualquer momento, digite *@fim* para encerrar a sessao atual, limpar o historico e voltar a este menu."""
 
 WELCOME_MESSAGES = {
-    "@clinica": "👋 Olá! Sou a Ana, assistente virtual da clínica. Como posso ajudar você hoje? Você gostaria de agendar, remarcar ou cancelar uma consulta?",
-    "@restaurante": "👋 Olá! Sou o Carlos, assistente virtual do restaurante. Como posso ajudar você? Gostaria de fazer um pedido ou consultar o estoque?",
+    "@clinica": "Ola! Sou a Ana, assistente virtual da clinica. Como posso ajudar voce hoje? Gostaria de agendar, remarcar ou cancelar uma consulta?",
+    "@restaurante": "Ola! Sou o Carlos, assistente virtual do restaurante. Como posso ajudar voce hoje? Gostaria de ver o cardapio, fazer um pedido ou reservar uma mesa?",
 }
 
-# Dicionário para rastrear sessões ativas em memória
+# Fallback in-memory dictionary if DB is temporarily unavailable
 active_sessions = {}
 
 
 class ChatHandler:
+    @staticmethod
+    async def _get_session(sender: str):
+        try:
+            db_prefix = await SessionRepository.get_active_session(sender)
+            if db_prefix:
+                active_sessions[sender] = db_prefix
+                return db_prefix
+        except Exception:
+            pass
+        return active_sessions.get(sender)
+
+    @staticmethod
+    async def _set_session(sender: str, prefix: str):
+        active_sessions[sender] = prefix
+        try:
+            await SessionRepository.set_active_session(sender, prefix)
+        except Exception:
+            pass
+
     @staticmethod
     async def process_incoming_message(msg: InboundWhatsAppMsg) -> dict:
         body = msg.body.strip()
         sender = msg.sender_id
         prefix_candidate = body.split(" ")[0].lower()
 
-        # 1. Comando para encerrar a conversa atual
+        # 1. Command to end current conversation and clear memory
         if body.lower() in ["@fim", "/end"]:
             await N8NService.delete_user_history(sender)
-            
-            # Limpar sessão em memória
             if sender in active_sessions:
                 del active_sessions[sender]
-            
-            # Enviar duas mensagens: confirmação + menu
-            confirm_msg = "✅ Conversa encerrada e histórico limpo!"
+
+            confirm_msg = "Conversa encerrada e historico limpo."
             await WhatsAppService.send_to_whatsapp(sender, confirm_msg)
             await WhatsAppService.send_to_whatsapp(sender, MENU_MSG)
             return {"status": "session_ended", "user": sender}
 
-        # 2. Verifica se o usuário já está em uma conversa ativa
-        active_prefix = active_sessions.get(sender)
-        
+        # 2. Check if user already has an active session in PostgreSQL / memory
+        active_prefix = await ChatHandler._get_session(sender)
+
         if active_prefix:
-            # Usuário já tem um prefixo ativo, usa a mensagem como está
             message_cleaned = body
         elif prefix_candidate in settings.n8n_webhooks:
-            # Novo prefixo detectado
             active_prefix = prefix_candidate
-            active_sessions[sender] = active_prefix
-            welcome_msg = WELCOME_MESSAGES.get(active_prefix, "👋 Olá! Como posso ajudar?")
+            await ChatHandler._set_session(sender, active_prefix)
+            welcome_msg = WELCOME_MESSAGES.get(active_prefix, "Ola! Como posso ajudar?")
             await WhatsAppService.send_to_whatsapp(sender, welcome_msg)
-            
+            await N8NService.seed_welcome_in_memory(sender, msg.sender_name, active_prefix, welcome_msg)
+
             message_cleaned = body[len(active_prefix):].strip()
-            
-            # Se a mensagem está vazia (só o prefixo), não roteia para n8n
             if not message_cleaned:
                 return {"status": "welcome_sent", "prefix": active_prefix}
         else:
-            # 3. Se não tem sessão ativa e não enviou prefixo válido, mostra menu
+            # 3. No active session and no valid prefix -> send menu
             await WhatsAppService.send_to_whatsapp(sender, MENU_MSG)
             return {"status": "menu_sent"}
 
+        # Log telemetry in PostgreSQL
+        try:
+            await ChatRepository.save_message(
+                user_id=sender,
+                sender_name=msg.sender_name,
+                prefix=active_prefix,
+                user_message=message_cleaned,
+                timestamp=msg.timestamp,
+            )
+        except Exception:
+            pass
+
         n8n_url = settings.n8n_webhooks[active_prefix]
-        
         payload_to_n8n = {
             "from": sender,
             "name": msg.sender_name,
-            "original_message": body,
+            "original_message": message_cleaned,
             "message_cleaned": message_cleaned,
             "prefix": active_prefix,
-            "timestamp": msg.timestamp
+            "timestamp": msg.timestamp,
         }
 
         await N8NService.route_to_n8n(n8n_url, active_prefix, payload_to_n8n)
