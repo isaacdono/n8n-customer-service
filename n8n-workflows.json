@@ -1,14 +1,14 @@
 {
-  "name": "Portfolio - Freelance (NVIDIA)",
+  "name": "n8n-customer-service-workflows",
   "nodes": [
     {
       "parameters": {
-        "content": "# 🗓️ BytezTech Appointment Bot\n\n## How it works\nTwo parallel flows run independently:\n1. **AI Chat Flow** — clients message the bot to book, reschedule, or cancel meetings. The agent checks Google Calendar availability, creates/updates/deletes events, and sends Gmail confirmations automatically.\n2. **Daily Sync Flow** — every morning at 9:30 AM IST, today's calendar events are cleared from the sheet, re-fetched, formatted, and re-inserted. An admin summary email is then sent.\n\n## Setup steps\n1. Add **Google Calendar OAuth** credential (jigneshmevada87@gmail.com)\n2. Add **Gmail OAuth** credential for agent tool + admin report node\n3. Add **Google Sheets OAuth** for Clear node; **Service Account** for Insert node\n4. Add **Groq API** key for the LLaMA 4 Scout language model\n5. **Activate** the workflow — both flows will run independently",
+        "content": "# Multi-Tenant Customer Service Engine\n\n## Architecture\nInbound WhatsApp messages are routed by FastAPI (`gateway/fastapi`) to specialized n8n webhook pipelines backed by PostgreSQL session state and Google Workspace integrations.",
         "height": 496,
         "width": 548
       },
       "id": "27e5a3f0-957b-4328-ade1-7e9e8f1abdf6",
-      "name": "⭐ Main Overview",
+      "name": "Main Overview",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         976,
@@ -20,7 +20,7 @@
       "parameters": {
         "calendar": {
           "__rl": true,
-          "value": "isaacoli.tech@gmail.com",
+          "value": "YOUR_GOOGLE_CALENDAR_EMAIL",
           "mode": "list",
           "cachedResultName": "Portfolio"
         },
@@ -42,7 +42,7 @@
       "rewireOutputLogTo": "ai_tool",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "TWt34ovaY2mnAgbv",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Calendar account"
         }
       }
@@ -52,7 +52,7 @@
         "operation": "getAll",
         "calendar": {
           "__rl": true,
-          "value": "isaacoli.tech@gmail.com",
+          "value": "YOUR_GOOGLE_CALENDAR_EMAIL",
           "mode": "list",
           "cachedResultName": "Portfolio"
         },
@@ -71,7 +71,7 @@
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "TWt34ovaY2mnAgbv",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Calendar account"
         }
       }
@@ -81,7 +81,7 @@
         "operation": "update",
         "calendar": {
           "__rl": true,
-          "value": "isaacoli.tech@gmail.com",
+          "value": "YOUR_GOOGLE_CALENDAR_EMAIL",
           "mode": "list",
           "cachedResultName": "Portfolio"
         },
@@ -101,7 +101,7 @@
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "TWt34ovaY2mnAgbv",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Calendar account"
         }
       }
@@ -111,7 +111,7 @@
         "operation": "delete",
         "calendar": {
           "__rl": true,
-          "value": "isaacoli.tech@gmail.com",
+          "value": "YOUR_GOOGLE_CALENDAR_EMAIL",
           "mode": "list",
           "cachedResultName": "Portfolio"
         },
@@ -128,7 +128,7 @@
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "TWt34ovaY2mnAgbv",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Calendar account"
         }
       }
@@ -185,7 +185,7 @@
         "operation": "getAll",
         "calendar": {
           "__rl": true,
-          "value": "isaacoli.tech@gmail.com",
+          "value": "YOUR_GOOGLE_CALENDAR_EMAIL",
           "mode": "list",
           "cachedResultName": "Portfolio"
         },
@@ -205,19 +205,19 @@
       "alwaysOutputData": true,
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "TWt34ovaY2mnAgbv",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Calendar account"
         }
       }
     },
     {
       "parameters": {
-        "content": "# Consultório / Clínica Workflow",
+        "content": "# Clinic Appointment Flow (@clinica)\n\n1. **Reactive Chat Flow** — Patients message the bot via WhatsApp (`@clinica`) to book, reschedule, or cancel appointments. The agent checks Google Calendar availability, executes CRUD operations, and persists session memory in PostgreSQL (`chat_history`).\n2. **Daily Reminder Cron (9 AM)** — Queries tomorrow's appointments from Google Calendar and dispatches proactive WhatsApp notifications via FastAPI.",
         "height": 80,
         "width": 548
       },
       "id": "2bb6bd9b-4adc-4163-a31f-da4a51d3476c",
-      "name": "⭐ Main Overview1",
+      "name": "Main Overview1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         3456,
@@ -230,7 +230,7 @@
         "promptType": "define",
         "text": "={{ $json.body.original_message }}",
         "options": {
-          "systemMessage": "=Você é o assistente virtual do Restaurante Demo, simpático e eficiente. Seu nome é Zé.\n\n🎯 RESPONSABILIDADES\n• Receber pedidos para delivery ou retirada\n• Informar o cardápio e preços\n• Registrar reservas de mesa\n\n📋 FLUXO DE PEDIDO\n1. Perguntar se é delivery, retirada ou mesa\n2. Apresentar cardápio se o cliente pedir\n3. Coletar os itens desejados\n4. Confirmar o pedido com total estimado\n5. Registrar no Google Sheets (aba 'pedidos') usando a tool Registrar Pedido\n\n\n📋 FLUXO DE RESERVA\n1. Coletar: nome, data, horário, número de pessoas\n2. Verificar disponibilidade no Sheets\n4. Confirmar para o cliente\n\n📋 FLUXO DE CARDÁPIO\n1. Ler a aba 'cardapio' do Google Sheets\n2. Listar apenas itens com disponivel = TRUE\n3. Formatar de forma legível com preços\n\nSempre responda em português do Brasil, de forma simpática e ágil. Nunca use linguagem robótica.\nFormate valores sempre em reais: R$ XX,XX\n\nHoje é {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}.Sempre use essa data como referência para qualquer cálculo de datas.",
+          "systemMessage": "=Voce e o assistente virtual do Restaurante Demo, simpatico e eficiente. Seu nome e Carlos.\nCaso ja tenha cumprimentado o cliente no historico da conversa, nao se apresente novamente; va direto ao ponto.\n\nHoje e {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}. Sempre use essa data como referencia para qualquer calculo de datas.\n\nRESPONSABILIDADES:\n- Receber pedidos para delivery ou retirada\n- Informar o cardapio e precos\n- Registrar reservas de mesa\n\nFLUXO DE PEDIDO:\n1. Perguntar se e delivery, retirada ou mesa\n2. Apresentar cardapio se o cliente pedir (usando Ler Cardapio)\n3. Coletar os itens desejados e quantidades (ex: 2x Item)\n4. Confirmar o pedido com o valor total estimado\n5. Registrar no Google Sheets (aba 'pedidos') usando a tool Registrar Pedido\n\nFLUXO DE RESERVA:\n1. Coletar: nome, data, horario e numero de pessoas\n2. Verificar disponibilidade na planilha usando Ler Reserva\n3. Registrar na planilha usando Registrar Reserva e confirmar para o cliente\n\nFLUXO DE CARDAPIO:\n1. Ler a aba 'cardapio' do Google Sheets\n2. Listar apenas itens com disponivel = TRUE\n3. Formatar de forma legivel com precos em reais (R$ XX,XX)\n\nESCALONAMENTO HUMANO:\n- Caso o cliente relate problema grave com entrega, solicite reembolso ou peca explicitamente um atendente humano, informe que a solicitacao foi encaminhada para um supervisor humano e encerre cordialmente.\n\nSempre responda em portugues do Brasil, de forma objetiva, natural e sem emojis.\n\nREGRA DE BREVIDADE NO WHATSAPP:\n- Responda em no maximo 2 frases curtas por mensagem (limite de 35 palavras).\n- Faca apenas UMA pergunta por vez para nao sobrecarregar o cliente.\n- Nunca envie listas longas a menos que o cliente peca o cardapio completo.",
           "maxIterations": 10
         }
       },
@@ -247,17 +247,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "portfolio - restaurante",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 2137517358,
           "mode": "list",
           "cachedResultName": "cardápio",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=2137517358"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=2137517358"
         },
         "options": {}
       },
@@ -271,7 +271,7 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "6KXsjN8ZebNSQo1u",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
@@ -299,17 +299,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "portfolio - restaurante",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": "gid=0",
           "mode": "list",
           "cachedResultName": "pedidos",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=0"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
         },
         "options": {}
       },
@@ -323,14 +323,14 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "6KXsjN8ZebNSQo1u",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "const rows = $input.all().map(i => i.json);\nconst agora = new Date();\nconst umaSemanaAtras = new Date();\numaSemanaAtras.setDate(agora.getDate() - 7);\numaSemanaAtras.setHours(0, 0, 0, 0);\n\nconst pedidosSemana = rows.filter(r => {\n  if (!r.data) return false;\n  const [d, m, y] = r.data.split('/');\n  const dataPedido = new Date(`${y}-${m}-${d}`);\n  return dataPedido >= umaSemanaAtras;\n});\n\nconst totalPedidos = pedidosSemana.length;\nconst faturamento = pedidosSemana.reduce((acc, r) => {\n  const val = parseFloat(\n    (r.total || '0').toString().replace('R$', '').replace(',', '.').trim()\n  );\n  return acc + (isNaN(val) ? 0 : val);\n}, 0);\n\n// Ranking contando unidades (ex: \"2x Hambúrguer\" soma 2)\nconst contagem = {};\npedidosSemana.forEach(r => {\n  const itens = (r.itens || '').split(',');\n  itens.forEach(item => {\n    const match = item.trim().match(/^(\\d+)x\\s*(.+)/i);\n    if (match) {\n      const qtd = parseInt(match[1]);\n      const key = match[2].trim();\n      contagem[key] = (contagem[key] || 0) + qtd;\n    } else {\n      const key = item.trim();\n      if (key) contagem[key] = (contagem[key] || 0) + 1;\n    }\n  });\n});\n\nconst ranking = Object.entries(contagem)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([item, qtd], i) => `${i+1}. ${item} (${qtd}x)`)\n  .join('\\n');\n\nconst mensagem = `📊 *Relatório Semanal do Restaurante*\\n\\n` +\n  `📦 Total de pedidos: ${totalPedidos}\\n` +\n  `💰 Faturamento estimado: R$ ${faturamento.toFixed(2).replace('.', ',')}\\n` +\n  `📈 Ticket médio: R$ ${totalPedidos > 0 ? (faturamento / totalPedidos).toFixed(2).replace('.', ',') : '0,00'}\\n\\n` +\n  `🏆 *Top 5 itens mais pedidos:*\\n${ranking || 'Sem dados suficientes'}\\n\\n` +\n  `_Bora mais essa semana! 💪_`;\n\nreturn [{ json: { mensagem } }];"
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst agora = new Date();\nconst umaSemanaAtras = new Date();\numaSemanaAtras.setDate(agora.getDate() - 7);\numaSemanaAtras.setHours(0, 0, 0, 0);\n\nconst pedidosSemana = rows.filter(r => {\n  if (!r.data) return false;\n  const [d, m, y] = r.data.split(\"/\");\n  const dataPedido = new Date(`${y}-${m}-${d}`);\n  return dataPedido >= umaSemanaAtras;\n});\n\nconst totalPedidos = pedidosSemana.length;\nconst faturamento = pedidosSemana.reduce((acc, r) => {\n  const val = parseFloat(\n    (r.total || \"0\").toString().replace(\"R$\", \"\").replace(\",\", \".\").trim()\n  );\n  return acc + (isNaN(val) ? 0 : val);\n}, 0);\n\nconst contagem = {};\npedidosSemana.forEach(r => {\n  const itens = (r.itens || \"\").split(\",\");\n  itens.forEach(item => {\n    const match = item.trim().match(/^(\\d+)x\\s*(.+)/i);\n    if (match) {\n      const qtd = parseInt(match[1]);\n      const key = match[2].trim();\n      contagem[key] = (contagem[key] || 0) + qtd;\n    } else {\n      const key = item.trim();\n      if (key) contagem[key] = (contagem[key] || 0) + 1;\n    }\n  });\n});\n\nconst ranking = Object.entries(contagem)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([item, qtd], i) => `${i + 1}. ${item} (${qtd}x)`)\n  .join(\"\\n\");\n\nconst mensagem = `*Relatorio Semanal do Restaurante*\\n\\n` +\n  `Total de pedidos: ${totalPedidos}\\n` +\n  `Faturamento estimado: R$ ${faturamento.toFixed(2).replace(\".\", \",\")}\\n` +\n  `Ticket medio: R$ ${totalPedidos > 0 ? (faturamento / totalPedidos).toFixed(2).replace(\".\", \",\") : \"0,00\"}\\n\\n` +\n  `*Top 5 itens mais pedidos:*\\n${ranking || \"Sem dados suficientes\"}`;\n\nreturn [{ json: { mensagem } }];"
       },
       "id": "94e1f56b-5a1b-430b-9890-046546c121e7",
       "name": "Calcular Relatório",
@@ -343,12 +343,12 @@
     },
     {
       "parameters": {
-        "content": "# Restaurante Workflow",
+        "content": "# Restaurant Order & Inventory Flow (@restaurante)\n\n1. **Reactive Order & Reservation Flow** — Customers message `@restaurante` to browse available menu items, place delivery/pickup orders, or book tables synced with Google Sheets.\n2. **Weekly BI Digest Cron (Monday 8 AM)** — Aggregates 7-day order volume, total revenue, average order value (AOV), and Top 5 items via JavaScript and sends the report over WhatsApp.",
         "height": 80,
         "width": 548
       },
       "id": "7bc905d7-f9c0-4548-b1fc-ee8a76875191",
-      "name": "⭐ Main Overview2",
+      "name": "Main Overview2",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         3472,
@@ -361,17 +361,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "portfolio - restaurante",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 252605372,
           "mode": "list",
           "cachedResultName": "reservas",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=252605372"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=252605372"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -455,7 +455,7 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "6KXsjN8ZebNSQo1u",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
@@ -464,17 +464,17 @@
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "portfolio - restaurante",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 252605372,
           "mode": "list",
           "cachedResultName": "reservas",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=252605372"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=252605372"
         },
         "options": {}
       },
@@ -488,7 +488,7 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "6KXsjN8ZebNSQo1u",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
@@ -498,17 +498,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "portfolio - restaurante",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": "gid=0",
           "mode": "list",
           "cachedResultName": "pedidos",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HDI5NPA3u33PB27NHEX19bqOQa0mrqQS-owoUJRAhm0/edit#gid=0"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -602,7 +602,7 @@
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "6KXsjN8ZebNSQo1u",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Google Sheets account"
         }
       }
@@ -628,7 +628,7 @@
         "promptType": "define",
         "text": "={{ $json.body.original_message }}",
         "options": {
-          "systemMessage": "=Você é Ana, assistente virtual simpática e acolhedora da nossa clínica médica. \nAtende pacientes pelo WhatsApp para agendar, remarcar ou cancelar consultas.\n\nHoje é {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}.Sempre use essa data como referência para qualquer cálculo de datas.\n\n---\n\n## 🛠️ Tools Disponíveis\n\n| Tool | Quando usar |\n|---|---|\n| `calendar_get_events` | Verificar disponibilidade ou buscar evento existente |\n| `calendar_create_event` | Criar nova consulta |\n| `calendar_update_event` | Remarcar consulta (NUNCA deletar para remarcar) |\n| `calendar_delete_event` | Cancelar consulta (somente a pedido explícito) |\n\n---\n\n## 📋 Fluxos\n\n**Agendamento**\n1. Colete: nome completo, data e horário desejados\n2. `calendar_get_events` → verificar disponibilidade\n3. `calendar_create_event` → criar consulta\n4. Confirme os detalhes ao paciente\n\n**Remarcação**\n1. `calendar_get_events` → localizar evento atual\n2. Verifique novo horário desejado\n3. `calendar_update_event` → atualizar (jamais deletar)\n4. Confirme nova data/horário ao paciente\n\n**Cancelamento**\n1. Confirme a intenção do paciente\n2. `calendar_get_events` → obter Event_ID\n3. `calendar_delete_event` → remover evento\n4. Confirme o cancelamento ao paciente",
+          "systemMessage": "=Voce e Ana, assistente virtual da nossa clinica medica.\nAtende pacientes pelo WhatsApp para agendar, remarcar ou cancelar consultas.\nCaso ja tenha cumprimentado o paciente no historico da conversa, nao se apresente novamente; responda diretamente a solicitacao.\n\nHoje e {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}. Sempre use essa data como referencia para qualquer calculo de datas. Use sempre fuso horario de Brasilia (GMT-3, formato ISO 8601: YYYY-MM-DDTHH:mm:ss-03:00).\n\nTOOLS DISPONIVEIS:\n- Buscar eventos no Google Calendar: verificar disponibilidade ou localizar agendamento existente\n- Criar evento no Google Calendar: criar nova consulta (duracao padrao: 1 hora)\n- Atualizar evento no Google Calendar: remarcar consulta existente (NUNCA deletar para remarcar)\n- Deletar evento no Google Calendar: cancelar consulta (somente a pedido explicito do paciente)\n\nHORARIOS PADRAO DISPONIVEIS:\n08:00, 09:00, 10:00, 14:00, 15:00, 16:30.\n\nFLUXO DE AGENDAMENTO:\n1. Coletar: nome completo, data e horario desejados\n2. Verificar disponibilidade no Google Calendar\n3. Se ocupado, sugerir ate 3 horarios alternativos; se livre, criar o evento\n4. Confirmar os detalhes ao paciente\n\nFLUXO DE REMARCACAO:\n1. Localizar o evento atual no Google Calendar para obter o Event_ID\n2. Verificar disponibilidade do novo horario desejado\n3. Atualizar o evento existente (jamais deletar) e confirmar ao paciente\n\nFLUXO DE CANCELAMENTO:\n1. Confirmar a intencao de cancelamento com o paciente\n2. Localizar o Event_ID no Google Calendar e remover o evento\n3. Confirmar o cancelamento ao paciente\n\nESCALONAMENTO HUMANO E EMERGENCIAS:\n- Se o paciente relatar emergencia medica, sintomas graves ou solicitar atendente humano, oriente procurar atendimento medico imediato / informe que a recepcao humana assumira o atendimento.\n\nSempre responda em portugues do Brasil, de forma acolhedora, clara e sem emojis.\n\nREGRA DE BREVIDADE NO WHATSAPP:\n- Responda em no maximo 2 frases curtas por mensagem (limite de 35 palavras).\n- Faca apenas UMA pergunta por vez para nao sobrecarregar o cliente.\n- Nunca envie listas longas a menos que o cliente peca o cardapio completo.",
           "maxIterations": 10
         }
       },
@@ -659,67 +659,54 @@
       "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
-          "id": "LWVFOft3JIsCGzVz",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Postgres account"
         }
       }
     },
     {
       "parameters": {
+        "model": "nvidia/nemotron-3.5-lightning:free",
         "options": {
-          "maxOutputTokens": 256,
-          "safetySettings": {
-            "values": [
-              {
-                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
-          }
+          "temperature": 0.3,
+          "maxTokens": 300
         }
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
         3392,
         1024
       ],
       "id": "8b688374-3de2-4a1d-af3d-ef9e4dbd46fc",
-      "name": "Google Gemini Chat Model",
+      "name": "OpenRouter Chat Model",
       "credentials": {
-        "googlePalmApi": {
-          "id": "28E3BbXGOscb8zfB",
-          "name": "Google Gemini(PaLM) Api account"
+        "openRouterApi": {
+          "id": "YOUR_N8N_CREDENTIAL_ID",
+          "name": "OpenRouter account"
         }
       }
     },
     {
       "parameters": {
-        "modelName": "models/gemini-3-flash-preview",
+        "model": "nvidia/nemotron-3.5-lightning:free",
         "options": {
-          "maxOutputTokens": 1024,
-          "safetySettings": {
-            "values": [
-              {
-                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-              }
-            ]
-          }
+          "temperature": 0.3,
+          "maxTokens": 300
         }
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
         3312,
         2192
       ],
       "id": "f016013d-86a6-4386-94ca-0e99199ace4e",
-      "name": "Google Gemini Chat Model1",
+      "name": "OpenRouter Chat Model1",
       "credentials": {
-        "googlePalmApi": {
-          "id": "28E3BbXGOscb8zfB",
-          "name": "Google Gemini(PaLM) Api account"
+        "openRouterApi": {
+          "id": "YOUR_N8N_CREDENTIAL_ID",
+          "name": "OpenRouter account"
         }
       }
     },
@@ -740,7 +727,7 @@
       "name": "Postgres Chat Memory1",
       "credentials": {
         "postgres": {
-          "id": "LWVFOft3JIsCGzVz",
+          "id": "YOUR_N8N_CREDENTIAL_ID",
           "name": "Postgres account"
         }
       }
@@ -798,7 +785,7 @@
           "parameters": [
             {
               "name": "to",
-              "value": "142575851852025@lid"
+              "value": "YOUR_WHATSAPP_LID"
             },
             {
               "name": "message",
@@ -888,7 +875,7 @@
           "parameters": [
             {
               "name": "to",
-              "value": "142575851852025@lid"
+              "value": "YOUR_WHATSAPP_LID"
             },
             {
               "name": "message",
@@ -937,7 +924,7 @@
           "params": {},
           "query": {},
           "body": {
-            "from": "142575851852025@lid",
+            "from": "YOUR_WHATSAPP_LID",
             "name": "Isaac",
             "original_message": "marque outro, por favor,",
             "message_cleaned": "marque outro, por favor,",
@@ -967,7 +954,7 @@
           "params": {},
           "query": {},
           "body": {
-            "from": "142575851852025@lid",
+            "from": "YOUR_WHATSAPP_LID",
             "name": "Isaac",
             "original_message": "marque outro, por favor,",
             "message_cleaned": "marque outro, por favor,",
@@ -1168,28 +1155,6 @@
         ]
       ]
     },
-    "Google Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent1",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Gemini Chat Model1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Postgres Chat Memory1": {
       "ai_memory": [
         [
@@ -1241,6 +1206,28 @@
           {
             "node": "If",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
