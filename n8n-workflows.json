@@ -7,12 +7,12 @@
         "height": 496,
         "width": 548
       },
-      "id": "27e5a3f0-957b-4328-ade1-7e9e8f1abdf6",
+      "id": "223db530-87b1-47b3-8451-16e15ad17a5c",
       "name": "Main Overview",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        976,
-        768
+        16,
+        832
       ],
       "typeVersion": 1
     },
@@ -31,21 +31,15 @@
           "summary": "={{ $fromAI('Summary', '', 'string') }}"
         }
       },
-      "id": "7e05bd5f-1399-4627-ad06-1642d8cd7262",
+      "id": "a96c8fb4-c8ab-4b06-a615-caa14857fe09",
       "name": "Criar evento no Google Calendar",
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        3712,
-        1056
+        2688,
+        416
       ],
-      "rewireOutputLogTo": "ai_tool",
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Calendar account"
-        }
-      }
+      "rewireOutputLogTo": "ai_tool"
     },
     {
       "parameters": {
@@ -61,20 +55,14 @@
         "timeMax": "={{ $fromAI('Before', '', 'string') }}",
         "options": {}
       },
-      "id": "521fbecf-53e8-4ccc-b1bb-b37aa98e2530",
+      "id": "bf95b524-e0a8-472a-88a4-ed98986dd77f",
       "name": "Buscar eventos no Google Calendar",
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        3872,
-        1056
-      ],
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Calendar account"
-        }
-      }
+        2848,
+        416
+      ]
     },
     {
       "parameters": {
@@ -91,20 +79,14 @@
           "start": "={{ $fromAI('Start', '', 'string') }}"
         }
       },
-      "id": "d13eb4d5-2f7d-4ddb-bb8d-f972deeb13b6",
+      "id": "5fb412d9-1136-4ffb-b4fe-d2d35bf76aec",
       "name": "Atualizar evento no Google Calendar",
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        4048,
-        1056
-      ],
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Calendar account"
-        }
-      }
+        3024,
+        416
+      ]
     },
     {
       "parameters": {
@@ -118,20 +100,14 @@
         "eventId": "={{ $fromAI('Event_ID', '', 'string') }}",
         "options": {}
       },
-      "id": "f82363a5-b8f0-4fcb-ab07-dcf548fb9c6f",
+      "id": "fb28923c-74c0-4e7b-a97b-15b968c64c13",
       "name": "Deletar evento no Google Calendar",
       "type": "n8n-nodes-base.googleCalendarTool",
       "typeVersion": 1.3,
       "position": [
-        4240,
-        1056
-      ],
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Calendar account"
-        }
-      }
+        3216,
+        416
+      ]
     },
     {
       "parameters": {
@@ -152,13 +128,13 @@
         },
         "options": {}
       },
-      "id": "2f249714-e235-48e8-86b1-d586d4a8e2c6",
+      "id": "137c05c1-7543-46bd-9525-639e692c8e28",
       "name": "Enviar resposta (FastAPI)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3936,
-        816
+        2912,
+        176
       ]
     },
     {
@@ -171,13 +147,13 @@
           ]
         }
       },
-      "id": "31c339bd-39d8-4d55-a4af-c3f24ed873cc",
+      "id": "7cb96a69-8ad3-4f4f-80d1-0f1b41bbdf3e",
       "name": "Lembrete Diário (9h)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        3328,
-        1280
+        2304,
+        640
       ]
     },
     {
@@ -190,38 +166,39 @@
           "cachedResultName": "Portfolio"
         },
         "returnAll": true,
-        "timeMin": "={{ $today.toISO() }}",
-        "timeMax": "={{ $today.plus({days: 1}).toISO() }}",
-        "options": {}
+        "timeMin": "={{ $today.plus({ days: 1 }).toISO() }}",
+        "timeMax": "={{ $today.plus({ days: 2 }).toISO() }}",
+        "options": {
+          "timeZone": {
+            "__rl": true,
+            "value": "America/Sao_Paulo",
+            "mode": "list",
+            "cachedResultName": "America/Sao_Paulo"
+          }
+        }
       },
-      "id": "cfc424a6-fb42-4fd5-ac15-69956987664c",
+      "id": "a5e061a6-a2f1-4f55-8ca4-1a56b08ab092",
       "name": "Buscar consultas de amanhã",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        3664,
-        1296
+        2640,
+        656
       ],
-      "alwaysOutputData": true,
-      "credentials": {
-        "googleCalendarOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Calendar account"
-        }
-      }
+      "alwaysOutputData": true
     },
     {
       "parameters": {
         "content": "# Clinic Appointment Flow (@clinica)\n\n1. **Reactive Chat Flow** — Patients message the bot via WhatsApp (`@clinica`) to book, reschedule, or cancel appointments. The agent checks Google Calendar availability, executes CRUD operations, and persists session memory in PostgreSQL (`chat_history`).\n2. **Daily Reminder Cron (9 AM)** — Queries tomorrow's appointments from Google Calendar and dispatches proactive WhatsApp notifications via FastAPI.",
-        "height": 80,
-        "width": 548
+        "height": 208,
+        "width": 964
       },
-      "id": "2bb6bd9b-4adc-4163-a31f-da4a51d3476c",
+      "id": "7c7c7e39-dffb-4394-959a-cd471f73e7e1",
       "name": "Main Overview1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3456,
-        672
+        880,
+        208
       ],
       "typeVersion": 1
     },
@@ -230,17 +207,17 @@
         "promptType": "define",
         "text": "={{ $json.body.original_message }}",
         "options": {
-          "systemMessage": "=Voce e o assistente virtual do Restaurante Demo, simpatico e eficiente. Seu nome e Carlos.\nCaso ja tenha cumprimentado o cliente no historico da conversa, nao se apresente novamente; va direto ao ponto.\n\nHoje e {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}. Sempre use essa data como referencia para qualquer calculo de datas.\n\nRESPONSABILIDADES:\n- Receber pedidos para delivery ou retirada\n- Informar o cardapio e precos\n- Registrar reservas de mesa\n\nFLUXO DE PEDIDO:\n1. Perguntar se e delivery, retirada ou mesa\n2. Apresentar cardapio se o cliente pedir (usando Ler Cardapio)\n3. Coletar os itens desejados e quantidades (ex: 2x Item)\n4. Confirmar o pedido com o valor total estimado\n5. Registrar no Google Sheets (aba 'pedidos') usando a tool Registrar Pedido\n\nFLUXO DE RESERVA:\n1. Coletar: nome, data, horario e numero de pessoas\n2. Verificar disponibilidade na planilha usando Ler Reserva\n3. Registrar na planilha usando Registrar Reserva e confirmar para o cliente\n\nFLUXO DE CARDAPIO:\n1. Ler a aba 'cardapio' do Google Sheets\n2. Listar apenas itens com disponivel = TRUE\n3. Formatar de forma legivel com precos em reais (R$ XX,XX)\n\nESCALONAMENTO HUMANO:\n- Caso o cliente relate problema grave com entrega, solicite reembolso ou peca explicitamente um atendente humano, informe que a solicitacao foi encaminhada para um supervisor humano e encerre cordialmente.\n\nSempre responda em portugues do Brasil, de forma objetiva, natural e sem emojis.\n\nREGRA DE BREVIDADE NO WHATSAPP:\n- Responda em no maximo 2 frases curtas por mensagem (limite de 35 palavras).\n- Faca apenas UMA pergunta por vez para nao sobrecarregar o cliente.\n- Nunca envie listas longas a menos que o cliente peca o cardapio completo.",
+          "systemMessage": "=Você é o Carlos, assistente virtual do Restaurante Demo, simpático e eficiente.\nREGRA DE SAUDAÇÃO: A mensagem inicial de boas-vindas já foi enviada automaticamente pelo sistema. NUNCA inicie suas respostas com \"Olá\", \"Oi\", \"Bom dia\" ou \"Boa tarde\"; vá direto ao ponto.\n\nHoje é {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}. Sempre use essa data como referência para qualquer cálculo de datas.\n\nRESPONSABILIDADES:\n- Informar o cardápio e preços\n- Receber pedidos para delivery, retirada ou consumo na mesa\n- Registrar reservas de mesa\n\nFLUXO DE CARDÁPIO:\n1. Ler a aba 'cardapio' do Google Sheets usando a tool Ler_Cardapio\n2. Listar apenas itens com disponível = TRUE\n3. Formatar SEMPRE em bullet points (um item por linha), com preços em reais:\n- Nome do Item: R$ XX,XX\n\nFLUXO DE PEDIDO:\n1. Coletar os itens desejados, quantidades e modalidade (delivery, retirada ou mesa)\n2. Mostrar o resumo do pedido em bullet points e pedir confirmação antes de registrar:\nResumo do pedido ([modalidade]):\n- [Qtd]x [Item] (R$ XX,XX)\nTotal: R$ XX,XX. Posso confirmar?\n3. Somente após o cliente confirmar (\"sim\"), registrar no Google Sheets usando a tool Registrar_Pedido e responder confirmando (use \"Bom apetite!\", nunca \"Boa apetite\").\n\nFLUXO DE RESERVA:\n1. Coletar: nome, data, horário e número de pessoas\n2. Verificar disponibilidade na planilha usando a tool Ler_Reserva\n3. Registrar na planilha usando a tool Registrar_Reserva e confirmar os dados em bullet points para o cliente\n\nESCALONAMENTO HUMANO:\n- Caso o cliente relate problema grave com entrega, solicite reembolso ou peça explicitamente um atendente humano, informe que a solicitação foi encaminhada para um supervisor humano e encerre cordialmente.\n\nREGRA DE BREVIDADE E FORMATAÇÃO NO WHATSAPP:\n- Sempre responda em português do Brasil, com acentuação correta, de forma objetiva, natural e sem emojis.\n- Sempre use bullet points (\"- \") para listar itens do cardápio, resumo de pedidos ou dados de reserva.\n- Faça apenas UMA pergunta por vez para não sobrecarregar o cliente.",
           "maxIterations": 10
         }
       },
-      "id": "5cbe0eb1-e26d-4187-bf78-443371532e6a",
+      "id": "a14c57a5-798d-4e95-99d3-8b7bd867583e",
       "name": "AI Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        3424,
-        1888
+        2400,
+        1248
       ]
     },
     {
@@ -261,20 +238,14 @@
         },
         "options": {}
       },
-      "id": "b9b21d23-4d43-43d8-917d-35392ba6902c",
-      "name": "Ler Cardápio (Sheets)",
+      "id": "a5f08d54-072a-4396-9fe6-a523bda2ca7d",
+      "name": "Ler Cardapio",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.5,
       "position": [
-        3968,
-        2144
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Sheets account"
-        }
-      }
+        2944,
+        1504
+      ]
     },
     {
       "parameters": {
@@ -286,13 +257,13 @@
           ]
         }
       },
-      "id": "95646415-0f41-4367-b310-92736d49d15c",
+      "id": "7586f326-9140-4c64-964c-1ca23679e684",
       "name": "Relatório Semanal (Segunda 8h)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        3360,
-        2464
+        2336,
+        1824
       ]
     },
     {
@@ -313,46 +284,40 @@
         },
         "options": {}
       },
-      "id": "f2b27d40-b534-41dd-8da4-14bb0c22484b",
+      "id": "4cf11eb8-0a2c-46e7-a4ac-de27fc9127c6",
       "name": "Ler Pedidos da Semana (Sheets)",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        3584,
-        2464
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Sheets account"
-        }
-      }
+        2560,
+        1824
+      ]
     },
     {
       "parameters": {
         "jsCode": "const rows = $input.all().map(i => i.json);\nconst agora = new Date();\nconst umaSemanaAtras = new Date();\numaSemanaAtras.setDate(agora.getDate() - 7);\numaSemanaAtras.setHours(0, 0, 0, 0);\n\nconst pedidosSemana = rows.filter(r => {\n  if (!r.data) return false;\n  const [d, m, y] = r.data.split(\"/\");\n  const dataPedido = new Date(`${y}-${m}-${d}`);\n  return dataPedido >= umaSemanaAtras;\n});\n\nconst totalPedidos = pedidosSemana.length;\nconst faturamento = pedidosSemana.reduce((acc, r) => {\n  const val = parseFloat(\n    (r.total || \"0\").toString().replace(\"R$\", \"\").replace(\",\", \".\").trim()\n  );\n  return acc + (isNaN(val) ? 0 : val);\n}, 0);\n\nconst contagem = {};\npedidosSemana.forEach(r => {\n  const itens = (r.itens || \"\").split(\",\");\n  itens.forEach(item => {\n    const match = item.trim().match(/^(\\d+)x\\s*(.+)/i);\n    if (match) {\n      const qtd = parseInt(match[1]);\n      const key = match[2].trim();\n      contagem[key] = (contagem[key] || 0) + qtd;\n    } else {\n      const key = item.trim();\n      if (key) contagem[key] = (contagem[key] || 0) + 1;\n    }\n  });\n});\n\nconst ranking = Object.entries(contagem)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([item, qtd], i) => `${i + 1}. ${item} (${qtd}x)`)\n  .join(\"\\n\");\n\nconst mensagem = `*Relatorio Semanal do Restaurante*\\n\\n` +\n  `Total de pedidos: ${totalPedidos}\\n` +\n  `Faturamento estimado: R$ ${faturamento.toFixed(2).replace(\".\", \",\")}\\n` +\n  `Ticket medio: R$ ${totalPedidos > 0 ? (faturamento / totalPedidos).toFixed(2).replace(\".\", \",\") : \"0,00\"}\\n\\n` +\n  `*Top 5 itens mais pedidos:*\\n${ranking || \"Sem dados suficientes\"}`;\n\nreturn [{ json: { mensagem } }];"
       },
-      "id": "94e1f56b-5a1b-430b-9890-046546c121e7",
+      "id": "c7f48653-177b-4f5a-8005-8356f8ae7a32",
       "name": "Calcular Relatório",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3808,
-        2464
+        2784,
+        1824
       ]
     },
     {
       "parameters": {
         "content": "# Restaurant Order & Inventory Flow (@restaurante)\n\n1. **Reactive Order & Reservation Flow** — Customers message `@restaurante` to browse available menu items, place delivery/pickup orders, or book tables synced with Google Sheets.\n2. **Weekly BI Digest Cron (Monday 8 AM)** — Aggregates 7-day order volume, total revenue, average order value (AOV), and Top 5 items via JavaScript and sends the report over WhatsApp.",
-        "height": 80,
-        "width": 548
+        "height": 240,
+        "width": 804
       },
-      "id": "7bc905d7-f9c0-4548-b1fc-ee8a76875191",
+      "id": "4f811f1c-854d-43e7-bf50-e5fa0377e20b",
       "name": "Main Overview2",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3472,
-        1744
+        832,
+        1456
       ],
       "typeVersion": 1
     },
@@ -445,20 +410,14 @@
         },
         "options": {}
       },
-      "id": "2a4b5cca-223f-4ac1-a7b4-f5d5d39c8a0a",
-      "name": "Registrar Reserva (Sheets)1",
+      "id": "297f9be1-7fd0-4577-968a-8cadaca0ce34",
+      "name": "Registrar Reserva",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.5,
       "position": [
-        4144,
-        2144
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Sheets account"
-        }
-      }
+        3120,
+        1504
+      ]
     },
     {
       "parameters": {
@@ -478,20 +437,14 @@
         },
         "options": {}
       },
-      "id": "73ef55a3-916f-4fc7-ab24-0447118e33be",
-      "name": "Ler Reserva (Sheets)1",
+      "id": "da9d5827-077f-43f3-8fde-1fce531c09ee",
+      "name": "Ler Reserva",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.5,
       "position": [
-        4288,
-        2144
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Sheets account"
-        }
-      }
+        3264,
+        1504
+      ]
     },
     {
       "parameters": {
@@ -592,20 +545,14 @@
         },
         "options": {}
       },
-      "id": "0d540faf-7368-41ee-aa3d-9c8f23b68c33",
-      "name": "Registrar Pedido (Sheets)",
+      "id": "4d704d89-de21-4993-9391-8826230b06b9",
+      "name": "Registrar Pedido",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.5,
       "position": [
-        3792,
-        2144
-      ],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Google Sheets account"
-        }
-      }
+        2768,
+        1504
+      ]
     },
     {
       "parameters": {
@@ -616,10 +563,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        3136,
-        816
+        2112,
+        176
       ],
-      "id": "ea229b0a-02bc-4e5b-ab5b-ea67b47083e8",
+      "id": "a414e04f-04eb-4aba-bf3a-05013448a77a",
       "name": "Webhook",
       "webhookId": "c798f6da-968f-45d2-b959-7c907457a3ba"
     },
@@ -628,17 +575,17 @@
         "promptType": "define",
         "text": "={{ $json.body.original_message }}",
         "options": {
-          "systemMessage": "=Voce e Ana, assistente virtual da nossa clinica medica.\nAtende pacientes pelo WhatsApp para agendar, remarcar ou cancelar consultas.\nCaso ja tenha cumprimentado o paciente no historico da conversa, nao se apresente novamente; responda diretamente a solicitacao.\n\nHoje e {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}. Sempre use essa data como referencia para qualquer calculo de datas. Use sempre fuso horario de Brasilia (GMT-3, formato ISO 8601: YYYY-MM-DDTHH:mm:ss-03:00).\n\nTOOLS DISPONIVEIS:\n- Buscar eventos no Google Calendar: verificar disponibilidade ou localizar agendamento existente\n- Criar evento no Google Calendar: criar nova consulta (duracao padrao: 1 hora)\n- Atualizar evento no Google Calendar: remarcar consulta existente (NUNCA deletar para remarcar)\n- Deletar evento no Google Calendar: cancelar consulta (somente a pedido explicito do paciente)\n\nHORARIOS PADRAO DISPONIVEIS:\n08:00, 09:00, 10:00, 14:00, 15:00, 16:30.\n\nFLUXO DE AGENDAMENTO:\n1. Coletar: nome completo, data e horario desejados\n2. Verificar disponibilidade no Google Calendar\n3. Se ocupado, sugerir ate 3 horarios alternativos; se livre, criar o evento\n4. Confirmar os detalhes ao paciente\n\nFLUXO DE REMARCACAO:\n1. Localizar o evento atual no Google Calendar para obter o Event_ID\n2. Verificar disponibilidade do novo horario desejado\n3. Atualizar o evento existente (jamais deletar) e confirmar ao paciente\n\nFLUXO DE CANCELAMENTO:\n1. Confirmar a intencao de cancelamento com o paciente\n2. Localizar o Event_ID no Google Calendar e remover o evento\n3. Confirmar o cancelamento ao paciente\n\nESCALONAMENTO HUMANO E EMERGENCIAS:\n- Se o paciente relatar emergencia medica, sintomas graves ou solicitar atendente humano, oriente procurar atendimento medico imediato / informe que a recepcao humana assumira o atendimento.\n\nSempre responda em portugues do Brasil, de forma acolhedora, clara e sem emojis.\n\nREGRA DE BREVIDADE NO WHATSAPP:\n- Responda em no maximo 2 frases curtas por mensagem (limite de 35 palavras).\n- Faca apenas UMA pergunta por vez para nao sobrecarregar o cliente.\n- Nunca envie listas longas a menos que o cliente peca o cardapio completo.",
+          "systemMessage": "=Você é Ana, assistente virtual da nossa clínica médica.\nAtende pacientes pelo WhatsApp para agendar, remarcar ou cancelar consultas.\nREGRA DE SAUDAÇÃO: A mensagem inicial de boas-vindas já foi enviada automaticamente pelo sistema. NUNCA inicie suas respostas com \"Olá\", \"Oi\", \"Bom dia\" ou \"Boa tarde\"; vá direto ao ponto.\n\nHoje é {{ $now.toFormat('dd/MM/yyyy') }}, {{ $now.toFormat('EEEE') }}. Sempre use essa data como referência para qualquer cálculo de datas. Use sempre fuso horário de Brasília (GMT-3, formato ISO 8601: YYYY-MM-DDTHH:mm:ss-03:00).\n\nTOOLS DISPONÍVEIS:\n- Buscar eventos no Google Calendar: verificar disponibilidade ou localizar agendamento existente\n- Criar evento no Google Calendar: criar nova consulta (duração padrão: 1 hora)\n- Atualizar evento no Google Calendar: remarcar consulta existente (NUNCA deletar para remarcar)\n- Deletar evento no Google Calendar: cancelar consulta (somente a pedido explícito do paciente)\n\nHORÁRIOS PADRÃO DISPONÍVEIS (segunda a sexta):\n08:00, 09:00, 10:00, 14:00, 15:00, 16:30.\n\nFLUXO DE CONSULTA DE DISPONIBILIDADE E AGENDAMENTO:\n1. Se o paciente apenas perguntar por horários disponíveis, pergunte somente o dia desejado (NÃO peça o nome completo antes de consultar a agenda).\n2. Ao listar horários livres, use bullet points (um por linha, ex: \"- 08:00\").\n3. Para fechar o agendamento, colete o nome completo (caso ainda não tenha), data e horário.\n4. Verifique na agenda usando \"Buscar eventos no Google Calendar\". Se livre, pergunte primeiro: \"Terça-feira (DD/MM) às HH:mm está livre. Posso confirmar o agendamento para [Nome]?\" (NÃO chame \"Criar evento\" nem diga \"Consulta agendada\" antes do paciente responder sim).\n5. Somente após a confirmação (\"sim\") do paciente, chame a tool \"Criar evento no Google Calendar\" e responda: \"Consulta confirmada para [dia], DD/MM, às HH:mm. Lembre-se de chegar 10 minutos antes.\"\n\nFLUXO DE REMARCAÇÃO:\n1. Localizar o evento atual no Google Calendar para obter o Event_ID\n2. Verificar disponibilidade do novo horário desejado\n3. Atualizar o evento existente (jamais deletar) e confirmar ao paciente\n\nFLUXO DE CANCELAMENTO:\n1. Confirmar a intenção de cancelamento com o paciente\n2. Localizar o Event_ID no Google Calendar e remover o evento\n3. Confirmar o cancelamento ao paciente\n\nESCALONAMENTO HUMANO E EMERGÊNCIAS:\n- Se o paciente relatar emergência médica, sintomas graves ou solicitar atendente humano, oriente procurar atendimento médico imediato / informe que a recepção humana assumirá o atendimento.\n\nREGRA DE BREVIDADE E FORMATAÇÃO NO WHATSAPP:\n- Sempre responda em português do Brasil, com acentuação correta, de forma acolhedora, clara e sem emojis.\n- Responda em no máximo 2 frases curtas por mensagem (exceto quando listar horários em bullet points).\n- Faça apenas UMA pergunta por vez.",
           "maxIterations": 10
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        3520,
-        816
+        2496,
+        176
       ],
-      "id": "3f346d11-9e65-4dc0-8a53-56ef13cf811a",
+      "id": "4e952cc7-8231-4e4e-910b-ed95fcf4a98c",
       "name": "AI Agent1",
       "retryOnFail": true
     },
@@ -652,63 +599,45 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        3536,
-        1024
+        2512,
+        384
       ],
-      "id": "f632c060-013c-44eb-b07d-e4956898e5fb",
-      "name": "Postgres Chat Memory",
-      "credentials": {
-        "postgres": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Postgres account"
-        }
-      }
+      "id": "c7519afa-b34f-42f5-94b9-9b530dff9541",
+      "name": "Postgres Chat Memory"
     },
     {
       "parameters": {
         "model": "nvidia/nemotron-3.5-lightning:free",
         "options": {
-          "temperature": 0.3,
-          "maxTokens": 300
+          "maxTokens": 2048,
+          "temperature": 0.3
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        3392,
-        1024
+        2368,
+        384
       ],
-      "id": "8b688374-3de2-4a1d-af3d-ef9e4dbd46fc",
-      "name": "OpenRouter Chat Model",
-      "credentials": {
-        "openRouterApi": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "OpenRouter account"
-        }
-      }
+      "id": "0f45dc33-d4cd-466b-8e77-c4b0fc716557",
+      "name": "OpenRouter Chat Model"
     },
     {
       "parameters": {
         "model": "nvidia/nemotron-3.5-lightning:free",
         "options": {
-          "temperature": 0.3,
-          "maxTokens": 300
+          "maxTokens": 2048,
+          "temperature": 0.3
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        3312,
-        2192
+        2288,
+        1552
       ],
-      "id": "f016013d-86a6-4386-94ca-0e99199ace4e",
-      "name": "OpenRouter Chat Model1",
-      "credentials": {
-        "openRouterApi": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "OpenRouter account"
-        }
-      }
+      "id": "f59e1041-402f-4f3c-8374-62c9defd377c",
+      "name": "OpenRouter Chat Model1"
     },
     {
       "parameters": {
@@ -720,17 +649,11 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        3552,
-        2192
+        2528,
+        1552
       ],
-      "id": "dfd59dae-061c-4c2b-a361-3bb6df29b92c",
-      "name": "Postgres Chat Memory1",
-      "credentials": {
-        "postgres": {
-          "id": "YOUR_N8N_CREDENTIAL_ID",
-          "name": "Postgres account"
-        }
-      }
+      "id": "08bafabb-4b32-49b7-ae69-f613b182351e",
+      "name": "Postgres Chat Memory1"
     },
     {
       "parameters": {
@@ -741,10 +664,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        3072,
-        1904
+        2048,
+        1264
       ],
-      "id": "3acd64d3-bff3-47d7-b53e-58cfd0bf14e1",
+      "id": "12619672-a0ca-4ffc-8ed5-c08e094ed0db",
       "name": "Webhook1",
       "webhookId": "c798f6da-968f-45d2-b959-7c907457a3ba"
     },
@@ -767,13 +690,13 @@
         },
         "options": {}
       },
-      "id": "09f716e4-e1aa-4a56-9efb-4a310ccf1879",
+      "id": "c1dd977f-5430-42e3-ab7a-668f0e2496ed",
       "name": "Enviar resposta (FastAPI)1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4048,
-        1888
+        3024,
+        1248
       ]
     },
     {
@@ -795,13 +718,13 @@
         },
         "options": {}
       },
-      "id": "8bdcc547-4476-4532-8eb5-4e8122a623cc",
+      "id": "b6fe4443-1438-401a-8b8d-da832135154b",
       "name": "Enviar resposta (FastAPI)2",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4384,
-        2464
+        3360,
+        1824
       ]
     },
     {
@@ -813,7 +736,7 @@
           "parameters": [
             {
               "name": "to",
-              "value": "={{ $('Webhook').item.json.body.from }}"
+              "value": "YOUR_WHATSAPP_LID"
             },
             {
               "name": "message",
@@ -823,13 +746,13 @@
         },
         "options": {}
       },
-      "id": "0d3527bc-393f-41e3-9bb7-583f4e22bce4",
+      "id": "9851e39d-9b54-46cb-b441-0f35f2dede51",
       "name": "Enviar resposta (FastAPI)3",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4592,
-        1216
+        3568,
+        576
       ]
     },
     {
@@ -860,10 +783,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4064,
-        1280
+        3040,
+        640
       ],
-      "id": "83837f2f-0ff2-4e3f-846c-f5e5d3a3680f",
+      "id": "68e777b8-01d1-4c9d-b095-47de501cad8b",
       "name": "If"
     },
     {
@@ -885,26 +808,26 @@
         },
         "options": {}
       },
-      "id": "19025490-473d-4411-b40c-2313ae5fd309",
+      "id": "712727f7-b335-4cc9-872d-a099a2b99b05",
       "name": "Enviar resposta (FastAPI)4",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4624,
-        1456
+        3600,
+        816
       ]
     },
     {
       "parameters": {
-        "jsCode": "const eventos = $json.items || [];\n\nif (eventos.length === 0) {\n  return [{ json: { vazio: true } }];\n}\n\nreturn eventos.map(e => ({ json: { ...e, vazio: false } }));"
+        "jsCode": "const eventos = $input.all().map(i => i.json).filter(e => e && e.id);\n\nif (eventos.length === 0) {\n  return [{ json: { vazio: true } }];\n}\n\nconst lista = eventos.map(e => {\n  const inicio = e.start?.dateTime || e.start?.date || '';\n  const horario = inicio.includes('T')\n    ? new Date(inicio).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })\n    : inicio;\n  return `- ${horario}: ${e.summary || 'Consulta'}`;\n}).join('\\n');\n\nreturn [{\n  json: {\n    vazio: false,\n    output: `*Lembrete de Consultas de Amanhã:*\\n${lista}`\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3872,
-        1296
+        2848,
+        656
       ],
-      "id": "43cfe9a6-b5ad-4477-b558-6fb7726e9864",
+      "id": "cc4f148c-3fb2-458c-b1c8-d49cb863203c",
       "name": "Code in JavaScript"
     }
   ],
@@ -1045,17 +968,6 @@
         ]
       ]
     },
-    "Ler Cardápio (Sheets)": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Relatório Semanal (Segunda 8h)": {
       "main": [
         [
@@ -1084,39 +996,6 @@
           {
             "node": "Enviar resposta (FastAPI)2",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Registrar Reserva (Sheets)1": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Ler Reserva (Sheets)1": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Registrar Pedido (Sheets)": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -1195,11 +1074,6 @@
         ]
       ]
     },
-    "Enviar resposta (FastAPI)3": {
-      "main": [
-        []
-      ]
-    },
     "Code in JavaScript": {
       "main": [
         [
@@ -1232,6 +1106,50 @@
           }
         ]
       ]
+    },
+    "Ler Cardapio": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Pedido": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ler Reserva": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Reserva": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1239,9 +1157,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": true,
-    "timeSavedMode": "fixed",
-    "timezone": "America/Sao_Paulo",
-    "callerPolicy": "workflowsFromSameOwner"
+    "timezone": "America/Sao_Paulo"
   },
   "versionId": "89057def-dad6-4d80-8871-f59bd7c9a60a",
   "meta": {

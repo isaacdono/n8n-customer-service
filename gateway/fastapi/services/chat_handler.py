@@ -5,18 +5,18 @@ from services.whatsapp_service import WhatsAppService
 from services.n8n_service import N8NService
 from core.config import settings
 
-MENU_MSG = """Ola! Bem-vindo ao gateway de atendimento automatizado.
+MENU_MSG = """Olá! Bem-vindo ao gateway de atendimento automatizado.
 
 Para iniciar, envie apenas "@clinica" ou "@restaurante":
 
-*@clinica* -> Agendamento, remarcacao e cancelamento de consultas (Google Calendar).
-*@restaurante* -> Cardapio, pedidos e reservas de mesa (Google Sheets CRM).
+*@clinica* -> Agendamento, remarcação e cancelamento de consultas (Google Calendar).
+*@restaurante* -> Cardápio, pedidos e reservas de mesa (Google Sheets CRM).
 
-A qualquer momento, digite *@fim* para encerrar a sessao atual, limpar o historico e voltar a este menu."""
+A qualquer momento, digite *@fim* para encerrar a sessão atual, limpar o histórico e voltar a este menu."""
 
 WELCOME_MESSAGES = {
-    "@clinica": "Ola! Sou a Ana, assistente virtual da clinica. Como posso ajudar voce hoje? Gostaria de agendar, remarcar ou cancelar uma consulta?",
-    "@restaurante": "Ola! Sou o Carlos, assistente virtual do restaurante. Como posso ajudar voce hoje? Gostaria de ver o cardapio, fazer um pedido ou reservar uma mesa?",
+    "@clinica": "Olá! Sou a Ana, assistente virtual da clínica. Como posso ajudar você hoje? Gostaria de agendar, remarcar ou cancelar uma consulta?",
+    "@restaurante": "Olá! Sou o Carlos, assistente virtual do restaurante. Como posso ajudar você hoje? Gostaria de ver o cardápio, fazer um pedido ou reservar uma mesa?",
 }
 
 # Fallback in-memory dictionary if DB is temporarily unavailable
@@ -55,7 +55,7 @@ class ChatHandler:
             if sender in active_sessions:
                 del active_sessions[sender]
 
-            confirm_msg = "Conversa encerrada e historico limpo."
+            confirm_msg = "Conversa encerrada e histórico limpo."
             await WhatsAppService.send_to_whatsapp(sender, confirm_msg)
             await WhatsAppService.send_to_whatsapp(sender, MENU_MSG)
             return {"status": "session_ended", "user": sender}

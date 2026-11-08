@@ -5,13 +5,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - FASTAPI_URL=http://fastapi-service:8000
-      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - FASTAPI_URL=${FASTAPI_URL:-http://fastapi-service:8000}
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
     volumes:
       - ./gateway/wwebjs/.wwebjs_auth:/usr/src/app/.wwebjs_auth
-    networks:
-      - gateway_network
     depends_on:
       fastapi-service:
         condition: service_started
@@ -22,20 +19,18 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - WWEBJS_SEND_URL=http://wwebjs-service:3000/send
+      - WWEBJS_SEND_URL=${WWEBJS_SEND_URL:-http://wwebjs-service:3000/send}
       - N8N_CLINICA=${N8N_CLINICA:-http://n8n:5678/webhook/clinica}
       - N8N_RESTAURANTE=${N8N_RESTAURANTE:-http://n8n:5678/webhook/restaurante}
-      - DATABASE_URL=${DATABASE_URL:-postgresql://chatuser:chatpass123@postgresql:5432/chat_history}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-chatuser}:${POSTGRES_PASSWORD:-chatpass123}@postgresql:5432/${POSTGRES_DB:-chat_history}}
     volumes:
       - ./gateway/fastapi:/app
-    networks:
-      - gateway_network
     depends_on:
       postgresql:
-        condition: service_started
+        condition: service_healthy
 
   postgresql:
-    image: postgres:16-alpine
+    image: postgres:16-alpine #  trocar para 17
     container_name: postgres_chathistory
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-chatuser}
@@ -46,8 +41,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./gateway/fastapi/init_db.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - gateway_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-chatuser} -d $${POSTGRES_DB:-chat_history}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   n8n:
     image: n8nio/n8n:latest
@@ -58,6 +56,8 @@ services:
       - N8N_HOST=0.0.0.0
       - N8N_PORT=5678
       - NODE_ENV=production
+      - TZ=${TZ:-America/Sao_Paulo}
+      - GENERIC_TIMEZONE=${TZ:-America/Sao_Paulo}
       - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgresql
@@ -67,16 +67,10 @@ services:
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-chatpass123}
     volumes:
       - n8n_data:/home/node/.n8n
-    networks:
-      - gateway_network
     depends_on:
       postgresql:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   n8n_data:
   postgres_data:
-
-networks:
-  gateway_network:
-    driver: bridge

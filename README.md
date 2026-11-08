@@ -35,9 +35,15 @@ Users interact through a single WhatsApp number and switch contexts using prefix
 
 ## Screenshots
 
-<!-- Add screenshots of the n8n canvas and WhatsApp conversation here -->
-* *n8n Workflow Canvas:* `docs/n8n-canvas.png`
-* *WhatsApp Interaction:* `docs/whatsapp-demo.png`
+### 1. Clinic Scheduling (`@clinica`)
+| n8n Workflow Canvas | WhatsApp Interaction |
+| :---: | :---: |
+| ![n8n Clinic Workflow](assets/n8n_clinic.png) | <img src="assets/wpp_clinic.jpeg" width="320" alt="WhatsApp Clinic Demo" /> |
+
+### 2. Restaurant Orders & Reservations (`@restaurante`)
+| n8n Workflow Canvas | WhatsApp Interaction |
+| :---: | :---: |
+| ![n8n Restaurant Workflow](assets/n8n_restaurant.png) | <img src="assets/wpp_restaurant.jpeg" width="320" alt="WhatsApp Restaurant Demo" /> |
 
 ## Quick Start
 

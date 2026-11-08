@@ -12,7 +12,15 @@ const PORT = process.env.PORT || 3000;
 const client = new Client({
     authStrategy: new LocalAuth(), // Saves the session in a .wwebjs_auth/ folder
     puppeteer: { 
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote'
+        ] 
     }
 });
 
