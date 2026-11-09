@@ -6,7 +6,7 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://fastapi-service:8000';
+const FASTAPI_URL = process.env.FASTAPI_URL;
 const PORT = process.env.PORT || 3000;
 
 const client = new Client({
